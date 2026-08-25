@@ -1,0 +1,135 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  padding: 14px 16px 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent-module);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+
+.compact {
+  padding: 10px 14px;
+}
+
+.badge {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent-module-soft);
+  border: 1px solid var(--accent-module-border);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--accent-module);
+}
+
+.title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.summary {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pill {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.progress {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.bar {
+  height: 7px;
+  border-radius: 999px;
+  background: var(--chart-track);
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  background: var(--accent-module);
+  border-radius: 999px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.primary,
+.ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.primary {
+  background: var(--accent-module);
+  border: 1px solid var(--accent-module);
+  color: #fff;
+}
+
+.primary:hover {
+  background: var(--accent-sync-hover);
+}
+
+.ghost {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.ghost:hover {
+  border-color: var(--accent-module-border);
+  color: var(--accent-module);
+}
+
+.compactRow {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.compactRow .title {
+  font-size: 14px;
+}
+
+@media (max-width: 720px) {
+  .compactRow {
+    grid-template-columns: 1fr;
+  }
+}
