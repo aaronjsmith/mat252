@@ -2,13 +2,20 @@ import { TitleBar } from './components/header/TitleBar';
 import { ThemeToggle } from './components/header/Toggles';
 import { StatusBar } from './components/StatusBar';
 import { WeekGroup } from './components/modules/WeekGroup';
-import { ASSESSMENTS, WEEK_GROUPS } from './data/catalog';
-import { readProgressSummary } from './state/progress';
+import { MasteryChart } from './components/progress/MasteryChart';
+import { ASSESSMENTS, WEEK_GROUPS, quizHref } from './data/catalog';
+import { readMasteryView, readProgressSummary } from './state/progress';
 import styles from './App.module.css';
+
+function go(href: string) {
+  window.history.pushState({}, '', href);
+  window.dispatchEvent(new PopStateEvent('popstate'));
+}
 
 export default function App() {
   const overview = ASSESSMENTS.find((a) => a.id === 'overview')!;
   const summary = readProgressSummary(overview);
+  const mastery = readMasteryView(overview);
 
   return (
     <div className={styles.app}>
@@ -34,6 +41,17 @@ export default function App() {
               Data collection, sampling, graphs, probability, inference, correlation, and
               regression — unofficial practice aligned to Ensign College MAT 252.
             </p>
+          </section>
+          <section className={styles.panel}>
+            <p className={styles.kicker}>Progress</p>
+            <h2 style={{ margin: 0, fontSize: 16 }}>Course mastery</h2>
+            <p className={styles.lead}>
+              Need 10 unaided correct answers per topic. Hints never count toward mastery.
+            </p>
+            <MasteryChart
+              view={mastery}
+              onTopicClick={(id) => go(quizHref('overview', { mode: id }))}
+            />
           </section>
           <section className={styles.panel}>
             <blockquote className={styles.quote}>

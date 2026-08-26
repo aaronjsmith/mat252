@@ -40,6 +40,8 @@
   position: sticky;
   top: 0;
   align-self: start;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
 }
 
 .boot {

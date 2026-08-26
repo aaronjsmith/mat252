@@ -522,6 +522,17 @@ export function weekAssessmentForTopic(topicId: TopicId): Assessment | undefined
   return ASSESSMENTS.find((a) => !a.compose && a.topicIds.includes(topicId));
 }
 
+/** Unique topics in a week group, in course catalog order. */
+export function topicsForWeek(weekId: string): TopicId[] {
+  const inWeek = new Set<TopicId>();
+  for (const a of ASSESSMENTS) {
+    if (a.available && a.weekId === weekId) {
+      for (const tid of a.topicIds) inWeek.add(tid);
+    }
+  }
+  return ALL_TOPICS.filter((tid) => inWeek.has(tid));
+}
+
 export const FLASHCARDS: { topic: TopicId; front: string; back: string; choices: string[] }[] = [
   {
     topic: 'center',

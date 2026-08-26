@@ -13,9 +13,12 @@ import {
   type TopicId,
 } from '../data/catalog';
 import { checkAnswer, generateQuestion, type Question } from '../questions/generate';
+import { MasteryChart } from '../components/progress/MasteryChart';
 import {
   allMastered,
+  effectiveTopicUnaided,
   isMastered,
+  readMasteryView,
   readProgress,
   readProgressSummary,
   setTopicUnaided,
@@ -65,8 +68,8 @@ export function QuizPage() {
   } | null>(null);
   const [invite, setInvite] = useState(false);
 
-  const progress = useMemo(() => readProgress(assessment.id), [assessment.id, tick]);
   const summary = useMemo(() => readProgressSummary(assessment), [assessment, tick]);
+  const mastery = useMemo(() => readMasteryView(assessment), [assessment, tick]);
 
   const nextQuestion = useCallback(
     (m: Mode, bossState?: typeof boss) => {
@@ -276,7 +279,7 @@ export function QuizPage() {
               }}
             >
               <span>{TOPIC_LABEL[tid]}</span>
-              <span className={styles.mastery}>{topicUnaided(progress, tid)}/{MASTER}</span>
+              <span className={styles.mastery}>{effectiveTopicUnaided(assessment, tid)}/{MASTER}</span>
             </button>
           ))}
         </aside>
@@ -380,6 +383,21 @@ export function QuizPage() {
             </button>
           </div>
         </section>
+
+        <aside className={styles.mastery}>
+          <h2>Mastery</h2>
+          <p className={styles.blurb}>
+            Need <strong>10 unaided corrects</strong> per topic. Hints never count. Slice fill is
+            unaided progress toward 10.
+          </p>
+          <MasteryChart
+            view={mastery}
+            onTopicClick={(id) => {
+              setBoss(null);
+              setMode(id);
+            }}
+          />
+        </aside>
       </main>
 
       <StatusBar

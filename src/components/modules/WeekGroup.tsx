@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Assessment, WeekGroup as WeekGroupType } from '../../data/catalog';
-import { collapseKey } from '../../state/progress';
+import { collapseKey, readWeekMasteryView } from '../../state/progress';
+import { MasteryChart } from '../progress/MasteryChart';
 import { QuizCard } from './QuizCard';
 import styles from './WeekGroup.module.css';
 
@@ -25,6 +26,7 @@ export function WeekGroup({
   quizzes: Assessment[];
 }) {
   const isOverview = week.id === 'overview';
+  const weekMastery = readWeekMasteryView(week.id);
   const [collapsed, setCollapsed] = useState(() =>
     isOverview ? false : Boolean(readCollapsed()[week.id]),
   );
@@ -56,6 +58,11 @@ export function WeekGroup({
             </span>
           </button>
         )}
+        {weekMastery.total > 0 ? (
+          <div className={styles.ring} title={`${weekMastery.mastered}/${weekMastery.total} topics mastered`}>
+            <MasteryChart view={weekMastery} compact />
+          </div>
+        ) : null}
       </header>
       {!collapsed && (
         <div className={isOverview ? styles.compactGrid : styles.grid}>

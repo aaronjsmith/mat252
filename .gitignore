@@ -34,3 +34,8 @@ canvas-cookies-*
 .env.*
 credentials.json
 
+
+# Local Canvas dump (copyrighted binaries; do not publish)
+course-content/
+__pycache__/
+

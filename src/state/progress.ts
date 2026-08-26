@@ -1,5 +1,11 @@
 import type { Assessment, TopicId } from '../data/catalog';
-import { MASTER, weekAssessmentForTopic } from '../data/catalog';
+import {
+  ASSESSMENTS,
+  MASTER,
+  TOPIC_LABEL,
+  topicsForWeek,
+  weekAssessmentForTopic,
+} from '../data/catalog';
 
 export interface TopicProgress {
   unaided_correct: number;
@@ -59,6 +65,105 @@ export function topicUnaided(state: ProgressState, topicId: TopicId): number {
   return Number(state.topics[topicId]?.unaided_correct) || 0;
 }
 
+/**
+ * Display/logic unaided for a topic. On compose (overview) quizzes, take the
+ * max of overview storage and the owning week quiz so prior week practice counts.
+ */
+export function effectiveTopicUnaided(assessment: Assessment, topicId: TopicId): number {
+  let n = topicUnaided(readProgress(assessment.id), topicId);
+  if (assessment.compose) {
+    const week = weekAssessmentForTopic(topicId);
+    if (week) n = Math.max(n, topicUnaided(readProgress(week.id), topicId));
+  }
+  return Math.min(MASTER, n);
+}
+
+/** Mastery percent for one topic (one decimal), matching MAT 107. */
+export function topicMasteryPct(unaided: number): number {
+  return Math.round((1000 * Math.min(unaided, MASTER)) / MASTER) / 10;
+}
+
+/** Dashboard slice colors — cycle the green/gold token ramp. */
+export const SLICE_COLORS = [
+  'var(--accent-module)',
+  'var(--chart-2)',
+  'var(--accent-presets)',
+  'var(--accent-highlights)',
+  'var(--accent-sync)',
+  'var(--chart-3)',
+  'var(--accent-new-chart)',
+  'var(--chart-1)',
+] as const;
+
+export interface MasterySlice {
+  id: TopicId;
+  label: string;
+  unaided: number;
+  needed: number;
+  mastery: number;
+  mastered: boolean;
+  color: string;
+}
+
+export interface MasteryView {
+  slices: MasterySlice[];
+  overall: number;
+  mastered: number;
+  total: number;
+  unaidedNeeded: number;
+}
+
+function masteryViewForTopics(
+  topicIds: TopicId[],
+  unaidedOf: (id: TopicId) => number,
+): MasteryView {
+  const slices: MasterySlice[] = topicIds.map((id, i) => {
+    const unaided = unaidedOf(id);
+    const mastery = topicMasteryPct(unaided);
+    return {
+      id,
+      label: TOPIC_LABEL[id],
+      unaided,
+      needed: MASTER,
+      mastery,
+      mastered: unaided >= MASTER,
+      color: SLICE_COLORS[i % SLICE_COLORS.length],
+    };
+  });
+  const unaidedSum = slices.reduce((sum, s) => sum + s.unaided, 0);
+  const total = slices.length;
+  const overallNeeded = total * MASTER;
+  const overall =
+    overallNeeded > 0 ? Math.round((1000 * unaidedSum) / overallNeeded) / 10 : 0;
+  return {
+    slices,
+    overall,
+    mastered: slices.filter((s) => s.mastered).length,
+    total,
+    unaidedNeeded: MASTER,
+  };
+}
+
+export function readMasteryView(assessment: Assessment): MasteryView {
+  return masteryViewForTopics(assessment.topicIds, (id) =>
+    effectiveTopicUnaided(assessment, id),
+  );
+}
+
+/** Week-group chart: unique week topics, max unaided across that week and overview. */
+export function readWeekMasteryView(weekId: string): MasteryView {
+  const topicIds = topicsForWeek(weekId);
+  return masteryViewForTopics(topicIds, (id) => {
+    let n = 0;
+    for (const a of ASSESSMENTS) {
+      if (!a.available || !a.topicIds.includes(id)) continue;
+      if (a.weekId !== weekId && !a.compose) continue;
+      n = Math.max(n, topicUnaided(readProgress(a.id), id));
+    }
+    return Math.min(MASTER, n);
+  });
+}
+
 export function setTopicUnaided(
   state: ProgressState,
   topicId: TopicId,
@@ -103,12 +208,7 @@ export function readProgressSummary(assessment: Assessment): ProgressSummary {
     const p = readProgress(assessment.id);
     let mastered = 0;
     for (const tid of topicIds) {
-      let n = topicUnaided(p, tid);
-      if (assessment.compose) {
-        const week = weekAssessmentForTopic(tid);
-        if (week) n = Math.max(n, topicUnaided(readProgress(week.id), tid));
-      }
-      if (n >= MASTER) mastered += 1;
+      if (effectiveTopicUnaided(assessment, tid) >= MASTER) mastered += 1;
     }
     const attempted = Number(p.total_attempted) || 0;
     const credit = Number(p.total_credit) || 0;

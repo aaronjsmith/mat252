@@ -6,8 +6,13 @@
 
 .head {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
+}
+
+.ring {
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .toggle {
