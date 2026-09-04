@@ -1,0 +1,537 @@
+import type { Assessment, BossCopy, ThemeId, TopicId, WeekGroup } from '../data/catalog';
+import { FLASHCARDS, THEMES, TOPIC_LABEL } from '../data/catalog';
+import type { Locale } from './locale';
+
+export const TOPIC_LABEL_ES: Record<TopicId, string> = {
+  data_types: 'Tipos de datos y medición',
+  sampling: 'Muestreo y sesgo',
+  graphs: 'Gráficas y tablas de frecuencia',
+  center: 'Media, mediana y moda',
+  spread: 'Dispersión y resumen de cinco números',
+  z_scores: 'Puntuaciones z y percentiles',
+  literacy: 'Alfabetización estadística',
+  prob_basic: 'Probabilidad básica',
+  prob_compound: 'Probabilidad compuesta',
+  discrete: 'VA discretas y binomial',
+  normal: 'Distribución normal',
+  clt: 'Distribuciones muestrales y TLC',
+  ci: 'Intervalos de confianza',
+  ht_one: 'Pruebas de hipótesis de una muestra',
+  ht_two: 'Pruebas de dos muestras',
+  chi_square: 'Pruebas de chi-cuadrado',
+  regression: 'Correlación y regresión',
+};
+
+const WEEK_ES: Record<string, { title: string; blurb: string }> = {
+  overview: {
+    title: 'Curso completo',
+    blurb: 'Todos los temas de MAT 252 en un cuestionario — Nutrir y fortalecer a lo largo del término.',
+  },
+  weeks12: {
+    title: 'Semanas 1–2 · Datos y descripción',
+    blurb: 'Recolección de datos, muestreo, gráficas, centro, dispersión y puntuaciones z.',
+  },
+  weeks34: {
+    title: 'Semanas 3–4 · Probabilidad y modelos',
+    blurb: 'Probabilidad, variables aleatorias discretas, la curva normal y el TLC.',
+  },
+  weeks57: {
+    title: 'Semanas 5–7 · Inferencia',
+    blurb: 'Intervalos de confianza, pruebas de hipótesis, chi-cuadrado, correlación y regresión.',
+  },
+};
+
+const ASSESSMENT_ES: Record<string, { title: string; summary: string; badge: string }> = {
+  overview: {
+    title: 'Panorama del curso',
+    summary: 'Todos los temas de estadística de MAT 252 con pistas y la pelea contra La Dispersión.',
+    badge: 'Reunión · La Dispersión',
+  },
+  assessment1: {
+    title: 'Evaluación 1',
+    summary: 'Datos, gráficas y estadística descriptiva — Semanas 1–2 con la pelea contra Pesas falsas.',
+    badge: 'Semanas 1–2 · Zarahemla',
+  },
+  lesson_data: {
+    title: 'Datos y muestreo',
+    summary: 'Tipos de datos, niveles de medición, métodos de muestreo y sesgo.',
+    badge: 'Semana 1 · Casa de reuniones',
+  },
+  lesson_desc: {
+    title: 'Estadística descriptiva',
+    summary: 'Tablas de frecuencia, gráficas, centro y dispersión.',
+    badge: 'Semana 2 · Instituto',
+  },
+  assessment2: {
+    title: 'Evaluación 2',
+    summary: 'Probabilidad y modelos de distribución — Semanas 3–4 con la pelea contra La Tempestad.',
+    badge: 'Semanas 3–4 · Abundancia',
+  },
+  lesson_prob: {
+    title: 'Probabilidad',
+    summary: 'Probabilidad clásica, complementos y eventos compuestos.',
+    badge: 'Semana 3 · Echar suertes',
+  },
+  lesson_dist: {
+    title: 'Distribuciones y TLC',
+    summary: 'Binomial, normal, puntuaciones z y distribuciones muestrales.',
+    badge: 'Semana 4 · Maná diario',
+  },
+  assessment3: {
+    title: 'Evaluación 3',
+    summary: 'Inferencia: intervalos, pruebas, chi-cuadrado y regresión — Semanas 5–7.',
+    badge: 'Semanas 5–7 · Deseret',
+  },
+  lesson_ci: {
+    title: 'Intervalos de confianza',
+    summary: 'Estimaciones puntuales e intervalos de confianza para medias y proporciones.',
+    badge: 'Semana 5 · Urim',
+  },
+  lesson_ht: {
+    title: 'Pruebas de hipótesis',
+    summary: 'Pruebas de una y dos muestras — experimentar con la palabra (Alma 32).',
+    badge: 'Semana 6 · Alma 32',
+  },
+  lesson_rel: {
+    title: 'Chi-cuadrado y regresión',
+    summary: 'Independencia, correlación, pendiente y r² — línea por línea.',
+    badge: 'Semana 7 · Línea por línea',
+  },
+};
+
+const THEMES_ES: Record<ThemeId, BossCopy> = {
+  gathering: {
+    name: 'La Dispersión',
+    invite: 'Cada tema está dominado 10/10. La Dispersión amenaza el registro — ¿pelear ahora?',
+    start: 'La Dispersión amenaza el registro del pueblo. Responde una pregunta sin ayuda de cada tema — sin pistas.',
+    startPractice: 'Pelea de práctica contra La Dispersión: una pregunta sin ayuda por tema — sin pistas.',
+    progress: 'La Dispersión · {current}/{total} · {topic}',
+    ok: 'El remanente se reúne · {current}/{total}. Sigue adelante.',
+    miss: 'Fallaste {topic} — el dominio baja a {progress}. Completa otra para continuar.',
+    fail: 'El registro está en riesgo. La Dispersión se escapa en {topic} — ese tema baja a {progress}.',
+    win: 'El remanente está reunido — el registro permanece. Estás listo para el curso.',
+    winPractice: '¡Victoria de práctica! Domina cada tema 10/10 y luego enfrenta de nuevo La Dispersión.',
+    cleared: 'La Dispersión superada',
+    fightLabel: 'Enfrentar La Dispersión',
+    practiceLabel: 'Práctica: La Dispersión',
+    emoji: '🌪️',
+    emojiHit: '💨',
+    emojiWin: '🧭',
+    emojiDead: '✨',
+  },
+  zarahemla: {
+    name: 'Pesas falsas',
+    invite: 'Cada tema está dominado 10/10. Las pesas falsas amenazan Zarahemla — ¿pelear ahora?',
+    start: 'Las pesas falsas amenazan a los mercaderes de Zarahemla. Una pregunta sin ayuda por tema — sin pistas.',
+    startPractice: 'Pelea de práctica contra Pesas falsas: una pregunta sin ayuda por tema — sin pistas.',
+    progress: 'Pesas falsas · {current}/{total} · {topic}',
+    ok: 'Las balanzas se estabilizan · {current}/{total}. Sigue por Zarahemla.',
+    miss: 'Fallaste {topic} — el dominio baja a {progress}. Completa otra para continuar.',
+    fail: 'Zarahemla está en peligro. Las pesas falsas se escapan en {topic} — ese tema baja a {progress}.',
+    win: 'Las balanzas son verdaderas — Zarahemla está a salvo. Estás listo para la evaluación.',
+    winPractice: '¡Victoria de práctica! Domina cada tema 10/10 y luego enfrenta de nuevo Pesas falsas.',
+    cleared: 'Pesas falsas superadas',
+    fightLabel: 'Enfrentar Pesas falsas',
+    practiceLabel: 'Práctica: Pesas falsas',
+    emoji: '⚖️',
+    emojiHit: '📉',
+    emojiWin: '🛡️',
+    emojiDead: '✅',
+  },
+  meetinghouse: {
+    name: 'El pase de lista',
+    invite: 'Cada tema está dominado 10/10. El pase de lista espera — ¿empezar ahora?',
+    start: 'El pase de lista: una pregunta sin ayuda por tema — sin pistas.',
+    startPractice: 'Practica el pase de lista: una pregunta sin ayuda por tema — sin pistas.',
+    progress: 'El pase de lista · {current}/{total} · {topic}',
+    ok: 'Nombres registrados · {current}/{total}. Continúa.',
+    miss: 'Fallaste {topic} — el dominio baja a {progress}. Completa otra para continuar.',
+    fail: 'La lista está incompleta en {topic} — ese tema baja a {progress}.',
+    win: 'Cada nombre está contado. Estás listo para esta semana.',
+    winPractice: '¡Victoria de práctica! Domina cada tema 10/10 y luego enfrenta de nuevo el pase de lista.',
+    cleared: 'Pase de lista superado',
+    fightLabel: 'Enfrentar el pase de lista',
+    practiceLabel: 'Práctica: Pase de lista',
+    emoji: '📋',
+    emojiHit: '✏️',
+    emojiWin: '📖',
+    emojiDead: '✔️',
+  },
+  institute: {
+    name: 'Rumores del adversario',
+    invite: 'Cada tema está dominado 10/10. Los rumores del adversario se agitan — ¿pelear ahora?',
+    start: 'Rumores del adversario: una pregunta sin ayuda por tema — sin pistas.',
+    startPractice: 'Pelea de práctica: una pregunta sin ayuda por tema — sin pistas.',
+    progress: 'Rumores · {current}/{total} · {topic}',
+    ok: 'La verdad abre camino · {current}/{total}. Sigue adelante.',
+    miss: 'Fallaste {topic} — el dominio baja a {progress}. Completa otra para continuar.',
+    fail: 'Los rumores se extienden en {topic} — ese tema baja a {progress}.',
+    win: 'Los rumores se calmaron. Estás listo para esta semana.',
+    winPractice: '¡Victoria de práctica! Domina cada tema 10/10 y luego enfrenta de nuevo los rumores.',
+    cleared: 'Rumores superados',
+    fightLabel: 'Enfrentar los rumores',
+    practiceLabel: 'Práctica: Rumores',
+    emoji: '🗣️',
+    emojiHit: '🗯️',
+    emojiWin: '📖',
+    emojiDead: '🔇',
+  },
+  lots: {
+    name: 'Echar suertes',
+    invite: 'Cada tema está dominado 10/10. Echar suertes espera — ¿empezar ahora?',
+    start: 'Echar suertes: una pregunta sin ayuda por tema — sin pistas.',
+    startPractice: 'Practica echar suertes: una pregunta sin ayuda por tema — sin pistas.',
+    progress: 'Echar suertes · {current}/{total} · {topic}',
+    ok: 'La suerte está echada · {current}/{total}. Continúa.',
+    miss: 'Fallaste {topic} — el dominio baja a {progress}. Completa otra para continuar.',
+    fail: 'La suerte te fue adversa en {topic} — ese tema baja a {progress}.',
+    win: 'La suerte se comprende. Estás listo para esta semana.',
+    winPractice: '¡Victoria de práctica! Domina cada tema 10/10 y luego echa suertes de nuevo.',
+    cleared: 'Echar suertes superado',
+    fightLabel: 'Echar suertes',
+    practiceLabel: 'Práctica: Echar suertes',
+    emoji: '🎲',
+    emojiHit: '💥',
+    emojiWin: '🛡️',
+    emojiDead: '🏳️',
+  },
+  bountiful: {
+    name: 'La Tempestad',
+    invite: 'Cada tema está dominado 10/10. La Tempestad espera — ¿empezar ahora?',
+    start: 'La Tempestad amenaza el barco de Nefi. Una pregunta sin ayuda por tema — sin pistas.',
+    startPractice: 'Pelea de práctica contra La Tempestad: una pregunta sin ayuda por tema — sin pistas.',
+    progress: 'La Tempestad · {current}/{total} · {topic}',
+    ok: 'La tormenta cede · {current}/{total}. Sigue por el barco de Nefi.',
+    miss: 'Fallaste {topic} — el dominio baja a {progress}. Completa otra para continuar.',
+    fail: 'El barco de Nefi está en riesgo. La Tempestad se escapa en {topic} — ese tema baja a {progress}.',
+    win: 'La Tempestad se calma — el barco de Nefi está a salvo. Estás listo para el cuestionario.',
+    winPractice: '¡Victoria de práctica! Domina cada tema 10/10 y luego enfrenta de nuevo La Tempestad.',
+    cleared: 'La Tempestad superada',
+    fightLabel: 'Enfrentar La Tempestad',
+    practiceLabel: 'Práctica: La Tempestad',
+    emoji: '⛈️',
+    emojiHit: '🌊',
+    emojiWin: '⛵',
+    emojiDead: '🌅',
+  },
+  urim: {
+    name: 'Urim y Tumim',
+    invite: 'Cada tema está dominado 10/10. Urim y Tumim esperan — ¿empezar ahora?',
+    start: 'Urim y Tumim: una pregunta sin ayuda por tema — sin pistas.',
+    startPractice: 'Práctica: una pregunta sin ayuda por tema — sin pistas.',
+    progress: 'Urim y Tumim · {current}/{total} · {topic}',
+    ok: 'Luz en las piedras · {current}/{total}. Continúa.',
+    miss: 'Fallaste {topic} — el dominio baja a {progress}. Completa otra para continuar.',
+    fail: 'Las piedras se oscurecen en {topic} — ese tema baja a {progress}.',
+    win: 'Los intérpretes brillan. Estás listo para esta semana.',
+    winPractice: '¡Victoria de práctica! Domina cada tema 10/10 y luego inténtalo de nuevo.',
+    cleared: 'Urim y Tumim superados',
+    fightLabel: 'Enfrentar Urim y Tumim',
+    practiceLabel: 'Práctica: Urim y Tumim',
+    emoji: '💎',
+    emojiHit: '✨',
+    emojiWin: '🔮',
+    emojiDead: '🌟',
+  },
+  manna: {
+    name: 'Maná diario',
+    invite: 'Cada tema está dominado 10/10. El maná diario espera — ¿empezar ahora?',
+    start: 'Maná diario: una pregunta sin ayuda por tema — sin pistas.',
+    startPractice: 'Practica el maná diario: una pregunta sin ayuda por tema — sin pistas.',
+    progress: 'Maná diario · {current}/{total} · {topic}',
+    ok: 'Suficiente para hoy · {current}/{total}. Continúa.',
+    miss: 'Fallaste {topic} — el dominio baja a {progress}. Completa otra para continuar.',
+    fail: 'El maná se echó a perder en {topic} — ese tema baja a {progress}.',
+    win: 'De sobra y de más. Estás listo para esta semana.',
+    winPractice: '¡Victoria de práctica! Domina cada tema 10/10 y luego recoge de nuevo.',
+    cleared: 'Maná diario superado',
+    fightLabel: 'Recoger maná diario',
+    practiceLabel: 'Práctica: Maná diario',
+    emoji: '🌾',
+    emojiHit: '🍂',
+    emojiWin: '🧺',
+    emojiDead: '☀️',
+  },
+  deseret: {
+    name: 'La abeja de la miel',
+    invite: 'Cada tema está dominado 10/10. El trabajo de la abeja espera — ¿empezar ahora?',
+    start: 'La abeja de la miel: una pregunta sin ayuda por tema — sin pistas.',
+    startPractice: 'Práctica: una pregunta sin ayuda por tema — sin pistas.',
+    progress: 'La abeja de la miel · {current}/{total} · {topic}',
+    ok: 'La colmena prospera · {current}/{total}. Sigue adelante.',
+    miss: 'Fallaste {topic} — el dominio baja a {progress}. Completa otra para continuar.',
+    fail: 'La colmena está amenazada en {topic} — ese tema baja a {progress}.',
+    win: 'Deseret permanece. Estás listo para la evaluación.',
+    winPractice: '¡Victoria de práctica! Domina cada tema 10/10 y luego enfrenta de nuevo a la abeja.',
+    cleared: 'Abeja superada',
+    fightLabel: 'Enfrentar a la abeja',
+    practiceLabel: 'Práctica: Abeja',
+    emoji: '🐝',
+    emojiHit: '🌼',
+    emojiWin: '🍯',
+    emojiDead: '🌿',
+  },
+  alma: {
+    name: 'Experimentar con la palabra',
+    invite: 'Cada tema está dominado 10/10. Experimentar con la palabra — ¿empezar ahora?',
+    start: 'Experimentar con la palabra (Alma 32): una pregunta sin ayuda por tema — sin pistas.',
+    startPractice: 'Practica el experimento: una pregunta sin ayuda por tema — sin pistas.',
+    progress: 'El experimento · {current}/{total} · {topic}',
+    ok: 'La semilla se hincha · {current}/{total}. Continúa.',
+    miss: 'Fallaste {topic} — el dominio baja a {progress}. Completa otra para continuar.',
+    fail: 'La semilla se marchita en {topic} — ese tema baja a {progress}.',
+    win: 'El árbol da fruto. Estás listo para esta semana.',
+    winPractice: '¡Victoria de práctica! Domina cada tema 10/10 y luego experimenta de nuevo.',
+    cleared: 'Experimento superado',
+    fightLabel: 'Hacer el experimento',
+    practiceLabel: 'Práctica: Experimento',
+    emoji: '🌱',
+    emojiHit: '🌧️',
+    emojiWin: '🌳',
+    emojiDead: '🍎',
+  },
+  line: {
+    name: 'Línea por línea',
+    invite: 'Cada tema está dominado 10/10. Línea por línea espera — ¿empezar ahora?',
+    start: 'Línea por línea: una pregunta sin ayuda por tema — sin pistas.',
+    startPractice: 'Práctica: una pregunta sin ayuda por tema — sin pistas.',
+    progress: 'Línea por línea · {current}/{total} · {topic}',
+    ok: 'Otra línea · {current}/{total}. Continúa.',
+    miss: 'Fallaste {topic} — el dominio baja a {progress}. Completa otra para continuar.',
+    fail: 'La línea se rompe en {topic} — ese tema baja a {progress}.',
+    win: 'Precepto por precepto. Estás listo para esta semana.',
+    winPractice: '¡Victoria de práctica! Domina cada tema 10/10 y luego añade otra línea.',
+    cleared: 'Línea por línea superado',
+    fightLabel: 'Enfrentar línea por línea',
+    practiceLabel: 'Práctica: Línea por línea',
+    emoji: '📏',
+    emojiHit: '📉',
+    emojiWin: '📈',
+    emojiDead: '🧭',
+  },
+};
+
+type Flashcard = (typeof FLASHCARDS)[number];
+
+const FLASHCARDS_ES: Flashcard[] = [
+  {
+    topic: 'center',
+    front: 'Media muestral',
+    back: 'x̄ = Σx / n',
+    choices: ['x̄ = Σx / n', 'μ = Σx / N', 'x̄ = (mín + máx) / 2', 'x̄ = n / Σx'],
+  },
+  {
+    topic: 'center',
+    front: 'Mediana (n impar)',
+    back: 'Valor central de la lista ordenada',
+    choices: [
+      'Valor central de la lista ordenada',
+      'Valor más frecuente',
+      'Máx − mín',
+      'Promedio del mín y el máx',
+    ],
+  },
+  {
+    topic: 'spread',
+    front: 'Desviación estándar muestral',
+    back: 's = √[ Σ(x − x̄)² / (n − 1) ]',
+    choices: [
+      's = √[ Σ(x − x̄)² / (n − 1) ]',
+      's = √[ Σ(x − x̄)² / n ]',
+      's = (máx − mín) / n',
+      's = Σ|x − x̄| / n',
+    ],
+  },
+  {
+    topic: 'spread',
+    front: 'RIC (rango intercuartílico)',
+    back: 'Q3 − Q1',
+    choices: ['Q3 − Q1', 'Q1 − Q3', 'máx − mín', 'Q2 − Q1'],
+  },
+  {
+    topic: 'z_scores',
+    front: 'Puntuación z',
+    back: 'z = (x − μ) / σ',
+    choices: ['z = (x − μ) / σ', 'z = (μ − x) / σ', 'z = x / σ', 'z = (x − μ) · σ'],
+  },
+  {
+    topic: 'normal',
+    front: 'Regla empírica (68–95–99.7)',
+    back: 'Cerca del 68% dentro de 1σ, 95% dentro de 2σ, 99.7% dentro de 3σ de una distribución acampanada',
+    choices: [
+      'Cerca del 68% dentro de 1σ, 95% dentro de 2σ, 99.7% dentro de 3σ de una distribución acampanada',
+      '50% dentro de 1σ, 75% dentro de 2σ, 100% dentro de 3σ',
+      'Siempre exactamente el 68% de cualquier conjunto está a 1s de la media',
+      'Solo aplica a distribuciones uniformes',
+    ],
+  },
+  {
+    topic: 'prob_basic',
+    front: 'Probabilidad clásica',
+    back: 'P(A) = (# de resultados igualmente posibles en A) / (# de resultados igualmente posibles)',
+    choices: [
+      'P(A) = (# de resultados igualmente posibles en A) / (# de resultados igualmente posibles)',
+      'P(A) = 1 − n(A)',
+      'P(A) = n(A) · n(S)',
+      'P(A) = n(S) − n(A)',
+    ],
+  },
+  {
+    topic: 'prob_basic',
+    front: 'Regla del complemento',
+    back: 'P(Aᶜ) = 1 − P(A)',
+    choices: ['P(Aᶜ) = 1 − P(A)', 'P(Aᶜ) = P(A) − 1', 'P(Aᶜ) = 1 / P(A)', 'P(Aᶜ) = P(A)'],
+  },
+  {
+    topic: 'prob_compound',
+    front: 'Eventos independientes (y)',
+    back: 'P(A y B) = P(A) · P(B)',
+    choices: [
+      'P(A y B) = P(A) · P(B)',
+      'P(A y B) = P(A) + P(B)',
+      'P(A y B) = P(A) + P(B) − P(A y B)',
+      'P(A y B) = P(A) / P(B)',
+    ],
+  },
+  {
+    topic: 'prob_compound',
+    front: 'Regla de la adición (o)',
+    back: 'P(A o B) = P(A) + P(B) − P(A y B)',
+    choices: [
+      'P(A o B) = P(A) + P(B) − P(A y B)',
+      'P(A o B) = P(A) · P(B)',
+      'P(A o B) = P(A) + P(B) + P(A y B)',
+      'P(A o B) = P(A) − P(B)',
+    ],
+  },
+  {
+    topic: 'discrete',
+    front: 'Valor esperado de una VA discreta',
+    back: 'E(X) = Σ [x · P(x)]',
+    choices: [
+      'E(X) = Σ [x · P(x)]',
+      'E(X) = Σ P(x)',
+      'E(X) = Σ x / n',
+      'E(X) = máx(x) · P(x)',
+    ],
+  },
+  {
+    topic: 'discrete',
+    front: 'Probabilidad binomial',
+    back: 'P(X = k) = C(n, k) pᵏ (1 − p)ⁿ⁻ᵏ',
+    choices: [
+      'P(X = k) = C(n, k) pᵏ (1 − p)ⁿ⁻ᵏ',
+      'P(X = k) = n p k',
+      'P(X = k) = pᵏ / n',
+      'P(X = k) = C(n, k) / p',
+    ],
+  },
+  {
+    topic: 'clt',
+    front: 'Error estándar de la media muestral',
+    back: 'σ / √n   (o s / √n cuando σ es desconocida)',
+    choices: [
+      'σ / √n   (o s / √n cuando σ es desconocida)',
+      'σ · √n',
+      'σ / n',
+      's · n',
+    ],
+  },
+  {
+    topic: 'ci',
+    front: 'IC para una media (σ conocida / n grande)',
+    back: 'x̄ ± z* · (σ / √n)',
+    choices: [
+      'x̄ ± z* · (σ / √n)',
+      'x̄ ± z* · σ',
+      'μ ± z* · (σ / √n)',
+      'x̄ ± z* / n',
+    ],
+  },
+  {
+    topic: 'ht_one',
+    front: 'Estadístico de prueba para H₀: μ = μ₀ (σ conocida)',
+    back: 'z = (x̄ − μ₀) / (σ / √n)',
+    choices: [
+      'z = (x̄ − μ₀) / (σ / √n)',
+      'z = (μ₀ − x̄) · √n',
+      'z = x̄ / σ',
+      'z = (x̄ − μ₀) · σ',
+    ],
+  },
+  {
+    topic: 'regression',
+    front: 'Correlación r',
+    back: 'Mide la fuerza y dirección de una asociación lineal (−1 a 1)',
+    choices: [
+      'Mide la fuerza y dirección de una asociación lineal (−1 a 1)',
+      'Es igual a la pendiente de la recta de regresión',
+      'Siempre es positiva',
+      'Prueba que x causa y',
+    ],
+  },
+  {
+    topic: 'regression',
+    front: 'Coeficiente de determinación',
+    back: 'r² = fracción de la variación de y explicada por el modelo lineal',
+    choices: [
+      'r² = fracción de la variación de y explicada por el modelo lineal',
+      'r² = pendiente de y sobre x',
+      'r² = residual del último punto',
+      'r² = P(error de tipo I)',
+    ],
+  },
+  {
+    topic: 'sampling',
+    front: 'Muestra aleatoria simple',
+    back: 'Toda muestra de tamaño n de la población es igualmente probable',
+    choices: [
+      'Toda muestra de tamaño n de la población es igualmente probable',
+      'El investigador elige unidades convenientes',
+      'Cada k-ésima unidad después de un inicio aleatorio',
+      'La población se divide en conglomerados y se usan todos',
+    ],
+  },
+  {
+    topic: 'literacy',
+    front: 'Correlación frente a causalidad',
+    back: 'Una r fuerte no prueba por sí sola que x cause y',
+    choices: [
+      'Una r fuerte no prueba por sí sola que x cause y',
+      'Si r está cerca de 1, x debe causar y',
+      'Si r = 0, x causa y',
+      'Causalidad es lo mismo que confusión',
+    ],
+  },
+];
+
+export function topicLabel(id: TopicId, locale: Locale): string {
+  return locale === 'es' ? TOPIC_LABEL_ES[id] : TOPIC_LABEL[id];
+}
+
+export function weekText(week: WeekGroup, locale: Locale): { title: string; blurb: string } {
+  if (locale !== 'es') return { title: week.title, blurb: week.blurb };
+  return WEEK_ES[week.id] ?? { title: week.title, blurb: week.blurb };
+}
+
+export function assessmentText(
+  assessment: Assessment,
+  locale: Locale,
+): { title: string; summary: string; badge: string } {
+  if (locale !== 'es') {
+    return { title: assessment.title, summary: assessment.summary, badge: assessment.badge };
+  }
+  return ASSESSMENT_ES[assessment.id] ?? {
+    title: assessment.title,
+    summary: assessment.summary,
+    badge: assessment.badge,
+  };
+}
+
+export function themeCopy(id: ThemeId, locale: Locale): BossCopy {
+  return locale === 'es' ? THEMES_ES[id] : THEMES[id];
+}
+
+export function localizedFlashcards(locale: Locale): Flashcard[] {
+  return locale === 'es' ? FLASHCARDS_ES : FLASHCARDS;
+}

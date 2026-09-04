@@ -1,5 +1,6 @@
 import type { TopicId } from '../data/catalog';
-import { FLASHCARDS } from '../data/catalog';
+import { localizedFlashcards } from '../i18n/catalog';
+import type { Locale } from '../i18n/locale';
 
 export type Question = {
   id: string;
@@ -14,6 +15,12 @@ export type Question = {
   calc: { ti: string; casio: string; excel: string };
   unit?: string;
 };
+
+let loc: Locale = 'en';
+
+function t(en: string, es: string): string {
+  return loc === 'es' ? es : en;
+}
 
 function id(): string {
   return 'q-' + Math.random().toString(36).slice(2, 10);
@@ -135,69 +142,176 @@ function dataSet(n = 8): number[] {
 function genDataTypes(): Question {
   const items = [
     [
-      'Number of institute students in a ward (count)',
-      'Quantitative · discrete',
-      ['Quantitative · discrete', 'Quantitative · continuous', 'Qualitative · nominal', 'Qualitative · ordinal'],
-      'Counts of people are numeric and cannot be fractions of a person in this context — discrete quantitative.',
+      t(
+        'Number of institute students in a ward (count)',
+        'Número de estudiantes del instituto en un barrio (conteo)',
+      ),
+      t('Quantitative · discrete', 'Cuantitativa · discreta'),
+      [
+        t('Quantitative · discrete', 'Cuantitativa · discreta'),
+        t('Quantitative · continuous', 'Cuantitativa · continua'),
+        t('Qualitative · nominal', 'Cualitativa · nominal'),
+        t('Qualitative · ordinal', 'Cualitativa · ordinal'),
+      ],
+      t(
+        'Counts of people are numeric and cannot be fractions of a person in this context — discrete quantitative.',
+        'Los conteos de personas son numéricos y no pueden ser fracciones de persona en este contexto — cuantitativa discreta.',
+      ),
     ],
     [
-      'Time (in minutes) to walk to the temple',
-      'Quantitative · continuous',
-      ['Quantitative · continuous', 'Quantitative · discrete', 'Qualitative · nominal', 'Qualitative · ordinal'],
-      'Time can take any value in an interval — continuous quantitative.',
+      t('Time (in minutes) to walk to the temple', 'Tiempo (en minutos) para caminar al templo'),
+      t('Quantitative · continuous', 'Cuantitativa · continua'),
+      [
+        t('Quantitative · continuous', 'Cuantitativa · continua'),
+        t('Quantitative · discrete', 'Cuantitativa · discreta'),
+        t('Qualitative · nominal', 'Cualitativa · nominal'),
+        t('Qualitative · ordinal', 'Cualitativa · ordinal'),
+      ],
+      t(
+        'Time can take any value in an interval — continuous quantitative.',
+        'El tiempo puede tomar cualquier valor en un intervalo — cuantitativa continua.',
+      ),
     ],
     [
-      'Home ward (name of congregation)',
-      'Qualitative · nominal',
-      ['Qualitative · nominal', 'Qualitative · ordinal', 'Quantitative · discrete', 'Quantitative · continuous'],
-      'Names of wards are categories with no ranking — nominal.',
+      t('Home ward (name of congregation)', 'Barrio de origen (nombre de la congregación)'),
+      t('Qualitative · nominal', 'Cualitativa · nominal'),
+      [
+        t('Qualitative · nominal', 'Cualitativa · nominal'),
+        t('Qualitative · ordinal', 'Cualitativa · ordinal'),
+        t('Quantitative · discrete', 'Cuantitativa · discreta'),
+        t('Quantitative · continuous', 'Cuantitativa · continua'),
+      ],
+      t(
+        'Names of wards are categories with no ranking — nominal.',
+        'Los nombres de barrios son categorías sin orden — nominal.',
+      ),
     ],
     [
-      'Temple recommend status: none / limited / full',
-      'Qualitative · ordinal',
-      ['Qualitative · ordinal', 'Qualitative · nominal', 'Quantitative · discrete', 'Quantitative · continuous'],
-      'The statuses have a natural order — ordinal.',
+      t(
+        'Temple recommend status: none / limited / full',
+        'Estado de la recomendación para el templo: ninguna / limitada / completa',
+      ),
+      t('Qualitative · ordinal', 'Cualitativa · ordinal'),
+      [
+        t('Qualitative · ordinal', 'Cualitativa · ordinal'),
+        t('Qualitative · nominal', 'Cualitativa · nominal'),
+        t('Quantitative · discrete', 'Cuantitativa · discreta'),
+        t('Quantitative · continuous', 'Cuantitativa · continua'),
+      ],
+      t('The statuses have a natural order — ordinal.', 'Los estados tienen un orden natural — ordinal.'),
     ],
   ] as const;
   const [prompt, answer, choices, hint] = choice(items);
-  return mc(`Classify this variable: ${prompt}.`, [...choices], answer, 'data_types', hint);
+  return mc(
+    t(`Classify this variable: ${prompt}.`, `Clasifica esta variable: ${prompt}.`),
+    [...choices],
+    answer,
+    'data_types',
+    hint,
+  );
 }
 
 function genSampling(): Question {
   const items = [
     [
-      'Every 10th name on a stake directory after a random start.',
-      'Systematic',
-      ['Systematic', 'Simple random', 'Stratified', 'Cluster', 'Convenience'],
-      'A random start, then every k-th unit, is systematic sampling.',
+      t(
+        'Every 10th name on a stake directory after a random start.',
+        'Cada décimo nombre en un directorio de estaca después de un inicio aleatorio.',
+      ),
+      t('Systematic', 'Sistemático'),
+      [
+        t('Systematic', 'Sistemático'),
+        t('Simple random', 'Aleatorio simple'),
+        t('Stratified', 'Estratificado'),
+        t('Cluster', 'Por conglomerados'),
+        t('Convenience', 'Por conveniencia'),
+      ],
+      t(
+        'A random start, then every k-th unit, is systematic sampling.',
+        'Un inicio aleatorio y luego cada k-ésima unidad es muestreo sistemático.',
+      ),
     ],
     [
-      'Randomly choose 4 wards in a stake, then survey every member of those wards.',
-      'Cluster',
-      ['Cluster', 'Stratified', 'Simple random', 'Systematic', 'Convenience'],
-      'Wards are clusters; all units inside the selected clusters are taken.',
+      t(
+        'Randomly choose 4 wards in a stake, then survey every member of those wards.',
+        'Elegir al azar 4 barrios de una estaca y encuestar a todos los miembros de esos barrios.',
+      ),
+      t('Cluster', 'Por conglomerados'),
+      [
+        t('Cluster', 'Por conglomerados'),
+        t('Stratified', 'Estratificado'),
+        t('Simple random', 'Aleatorio simple'),
+        t('Systematic', 'Sistemático'),
+        t('Convenience', 'Por conveniencia'),
+      ],
+      t(
+        'Wards are clusters; all units inside the selected clusters are taken.',
+        'Los barrios son conglomerados; se toman todas las unidades de los conglomerados elegidos.',
+      ),
     ],
     [
-      'Split a campus into first-year / returning students, then take an SRS from each group.',
-      'Stratified',
-      ['Stratified', 'Cluster', 'Simple random', 'Systematic', 'Convenience'],
-      'Strata are sampled separately so each group is represented.',
+      t(
+        'Split a campus into first-year / returning students, then take an SRS from each group.',
+        'Dividir un campus en estudiantes de primer año / que regresan y tomar una MAS de cada grupo.',
+      ),
+      t('Stratified', 'Estratificado'),
+      [
+        t('Stratified', 'Estratificado'),
+        t('Cluster', 'Por conglomerados'),
+        t('Simple random', 'Aleatorio simple'),
+        t('Systematic', 'Sistemático'),
+        t('Convenience', 'Por conveniencia'),
+      ],
+      t(
+        'Strata are sampled separately so each group is represented.',
+        'Los estratos se muestrean por separado para que cada grupo esté representado.',
+      ),
     ],
     [
-      'Survey the first 30 people who walk into the testing center.',
-      'Convenience',
-      ['Convenience', 'Simple random', 'Stratified', 'Cluster', 'Systematic'],
-      'Whoever is handy is a convenience sample — often biased.',
+      t(
+        'Survey the first 30 people who walk into the testing center.',
+        'Encuestar a las primeras 30 personas que entran al centro de exámenes.',
+      ),
+      t('Convenience', 'Por conveniencia'),
+      [
+        t('Convenience', 'Por conveniencia'),
+        t('Simple random', 'Aleatorio simple'),
+        t('Stratified', 'Estratificado'),
+        t('Cluster', 'Por conglomerados'),
+        t('Systematic', 'Sistemático'),
+      ],
+      t(
+        'Whoever is handy is a convenience sample — often biased.',
+        'Quien esté a la mano es una muestra por conveniencia — a menudo sesgada.',
+      ),
     ],
     [
-      'Every equally likely sample of 40 students from the college roster.',
-      'Simple random',
-      ['Simple random', 'Stratified', 'Cluster', 'Systematic', 'Convenience'],
-      'An SRS gives every sample of size n the same chance.',
+      t(
+        'Every equally likely sample of 40 students from the college roster.',
+        'Toda muestra igualmente probable de 40 estudiantes de la lista del colegio.',
+      ),
+      t('Simple random', 'Aleatorio simple'),
+      [
+        t('Simple random', 'Aleatorio simple'),
+        t('Stratified', 'Estratificado'),
+        t('Cluster', 'Por conglomerados'),
+        t('Systematic', 'Sistemático'),
+        t('Convenience', 'Por conveniencia'),
+      ],
+      t(
+        'An SRS gives every sample of size n the same chance.',
+        'Una MAS da a cada muestra de tamaño n la misma probabilidad.',
+      ),
     ],
   ] as const;
   const [prompt, answer, choices, hint] = choice(items);
-  return mc(`Which sampling method is this? ${prompt}`, [...choices], answer, 'sampling', hint);
+  return mc(
+    t(`Which sampling method is this? ${prompt}`, `¿Qué método de muestreo es este? ${prompt}`),
+    [...choices],
+    answer,
+    'sampling',
+    hint,
+  );
 }
 
 function genGraphs(): Question {
@@ -210,21 +324,35 @@ function genGraphs(): Question {
     const i = randInt(0, 3);
     const ans = num(freq[i]! / n, 4);
     return numeric(
-      `A class of ${n} students has frequencies ${freq.join(', ')} in four bins. What is the relative frequency of bin ${i + 1}?`,
+      t(
+        `A class of ${n} students has frequencies ${freq.join(', ')} in four bins. What is the relative frequency of bin ${i + 1}?`,
+        `Una clase de ${n} estudiantes tiene frecuencias ${freq.join(', ')} en cuatro intervalos. ¿Cuál es la frecuencia relativa del intervalo ${i + 1}?`,
+      ),
       ans,
       'graphs',
       0.01,
-      'Relative frequency = class count / n.',
+      t('Relative frequency = class count / n.', 'Frecuencia relativa = conteo de la clase / n.'),
       `${freq[i]} / ${n}`,
       calc(`(${freq[i]}) ÷ ${n} =`, `=${freq[i]}/${n}`),
     );
   }
   return mc(
-    'Which display is best for a single quantitative variable’s shape (univariate)?',
-    ['Histogram', 'Pie chart of categories', 'Scatterplot', 'Two-way table'],
-    'Histogram',
+    t(
+      'Which display is best for a single quantitative variable’s shape (univariate)?',
+      '¿Qué gráfica es mejor para la forma de una sola variable cuantitativa (univariada)?',
+    ),
+    [
+      t('Histogram', 'Histograma'),
+      t('Pie chart of categories', 'Gráfica circular de categorías'),
+      t('Scatterplot', 'Diagrama de dispersión'),
+      t('Two-way table', 'Tabla de doble entrada'),
+    ],
+    t('Histogram', 'Histograma'),
     'graphs',
-    'Histograms (or stemplots) show shape, center, and spread of one quantitative variable.',
+    t(
+      'Histograms (or stemplots) show shape, center, and spread of one quantitative variable.',
+      'Los histogramas (o diagramas de tallo) muestran forma, centro y dispersión de una variable cuantitativa.',
+    ),
   );
 }
 
@@ -237,24 +365,27 @@ function genCenter(): Question {
     const ans = mean(data);
     const terms = data.join(' + ');
     return numeric(
-      `Find the mean of ${ds(data)}.`,
+      t(`Find the mean of ${ds(data)}.`, `Halla la media de ${ds(data)}.`),
       ans,
       'center',
       0.05,
-      'Mean = sum of values ÷ how many values.',
-      `mean = (${terms}) / ${data.length}`,
+      t('Mean = sum of values ÷ how many values.', 'Media = suma de los valores ÷ cuántos valores hay.'),
+      t(`mean = (${terms}) / ${data.length}`, `media = (${terms}) / ${data.length}`),
       calc(`(${terms}) ÷ ${data.length} =`, `=AVERAGE(${data.join(',')})`),
     );
   }
   if (ask === 'median') {
     const sorted = data.slice().sort((a, b) => a - b);
     return numeric(
-      `Find the median of ${ds(data)}.`,
+      t(`Find the median of ${ds(data)}.`, `Halla la mediana de ${ds(data)}.`),
       median(data),
       'center',
       0.01,
-      'Order the list; the median is the middle (or average of the two middles).',
-      `Sorted: ${ds(sorted)}`,
+      t(
+        'Order the list; the median is the middle (or average of the two middles).',
+        'Ordena la lista; la mediana es el valor central (o el promedio de los dos centrales).',
+      ),
+      t(`Sorted: ${ds(sorted)}`, `Ordenado: ${ds(sorted)}`),
       calc(''),
     );
   }
@@ -262,24 +393,24 @@ function genCenter(): Question {
     const m = mode(data);
     if (m === null) return genCenter();
     return numeric(
-      `Find the mode of ${ds(data)}.`,
+      t(`Find the mode of ${ds(data)}.`, `Halla la moda de ${ds(data)}.`),
       m,
       'center',
       0,
-      'The mode is the value that appears most often.',
-      'Count frequencies; pick the most frequent value.',
+      t('The mode is the value that appears most often.', 'La moda es el valor que aparece con más frecuencia.'),
+      t('Count frequencies; pick the most frequent value.', 'Cuenta las frecuencias; elige el valor más frecuente.'),
       calc(''),
     );
   }
   const lo = Math.min(...data);
   const hi = Math.max(...data);
   return numeric(
-    `Find the range of ${ds(data)}.`,
+    t(`Find the range of ${ds(data)}.`, `Halla el rango de ${ds(data)}.`),
     hi - lo,
     'center',
     0,
-    'Range = maximum − minimum.',
-    `range = ${hi} − ${lo}`,
+    t('Range = maximum − minimum.', 'Rango = máximo − mínimo.'),
+    t(`range = ${hi} − ${lo}`, `rango = ${hi} − ${lo}`),
     calc(`${hi} − ${lo} =`),
   );
 }
@@ -293,23 +424,29 @@ function genSpread(): Question {
   const iqr = q3 - q1;
   if (ask === 'iqr') {
     return numeric(
-      `For ${ds(data)}, find the IQR (use the median of the lower half and upper half after sorting; n = 8).`,
+      t(
+        `For ${ds(data)}, find the IQR (use the median of the lower half and upper half after sorting; n = 8).`,
+        `Para ${ds(data)}, halla el RIC (usa la mediana de la mitad inferior y de la superior después de ordenar; n = 8).`,
+      ),
       iqr,
       'spread',
       0.05,
-      'IQR = Q3 − Q1.',
-      `Sorted ${ds(sorted)}. Q1 = ${q1}, Q3 = ${q3}.`,
+      t('IQR = Q3 − Q1.', 'RIC = Q3 − Q1.'),
+      t(`Sorted ${ds(sorted)}. Q1 = ${q1}, Q3 = ${q3}.`, `Ordenado ${ds(sorted)}. Q1 = ${q1}, Q3 = ${q3}.`),
       calc(`${q3} − ${q1} =`),
     );
   }
   if (ask === 'range4') {
     const approx = (Math.max(...data) - Math.min(...data)) / 4;
     return numeric(
-      `Estimate s for ${ds(data)} using the range rule of thumb (range / 4).`,
+      t(
+        `Estimate s for ${ds(data)} using the range rule of thumb (range / 4).`,
+        `Estima s para ${ds(data)} usando la regla del rango (rango / 4).`,
+      ),
       approx,
       'spread',
       0.05,
-      'A rough estimate is s ≈ (max − min) / 4.',
+      t('A rough estimate is s ≈ (max − min) / 4.', 'Una estimación aproximada es s ≈ (máx − mín) / 4.'),
       `s ≈ (${Math.max(...data)} − ${Math.min(...data)}) / 4`,
       calc(`(${Math.max(...data)} − ${Math.min(...data)}) ÷ 4 =`),
     );
@@ -317,12 +454,21 @@ function genSpread(): Question {
   const fence = q3 + 1.5 * iqr;
   const has = sorted.some((x) => x > fence || x < q1 - 1.5 * iqr);
   return mc(
-    `Using 1.5·IQR fences on ${ds(data)} (Q1 = ${q1}, Q3 = ${q3}), are there any outliers?`,
-    ['Yes', 'No'],
-    has ? 'Yes' : 'No',
+    t(
+      `Using 1.5·IQR fences on ${ds(data)} (Q1 = ${q1}, Q3 = ${q3}), are there any outliers?`,
+      `Usando cercas de 1.5·RIC en ${ds(data)} (Q1 = ${q1}, Q3 = ${q3}), ¿hay valores atípicos?`,
+    ),
+    [t('Yes', 'Sí'), t('No', 'No')],
+    has ? t('Yes', 'Sí') : t('No', 'No'),
     'spread',
-    'Outliers lie below Q1 − 1.5·IQR or above Q3 + 1.5·IQR.',
-    `Lower fence ${num(q1 - 1.5 * iqr)}; upper fence ${num(fence)}.`,
+    t(
+      'Outliers lie below Q1 − 1.5·IQR or above Q3 + 1.5·IQR.',
+      'Los atípicos quedan por debajo de Q1 − 1.5·RIC o por encima de Q3 + 1.5·RIC.',
+    ),
+    t(
+      `Lower fence ${num(q1 - 1.5 * iqr)}; upper fence ${num(fence)}.`,
+      `Cerca inferior ${num(q1 - 1.5 * iqr)}; cerca superior ${num(fence)}.`,
+    ),
   );
 }
 
@@ -334,11 +480,17 @@ function genZScores(): Question {
   const ask = choice(['z', 'x']);
   if (ask === 'z') {
     return numeric(
-      `If μ = ${mu} and σ = ${sigma}, what is the z-score for x = ${x}?`,
+      t(
+        `If μ = ${mu} and σ = ${sigma}, what is the z-score for x = ${x}?`,
+        `Si μ = ${mu} y σ = ${sigma}, ¿cuál es la puntuación z de x = ${x}?`,
+      ),
       z,
       'z_scores',
       0.05,
-      'z = (x − μ) / σ. Sign tells you which side of the mean.',
+      t(
+        'z = (x − μ) / σ. Sign tells you which side of the mean.',
+        'z = (x − μ) / σ. El signo indica de qué lado de la media está.',
+      ),
       `z = (${x} − ${mu}) / ${sigma}`,
       calc(`(${x} − ${mu}) ÷ ${sigma} =`),
     );
@@ -346,7 +498,7 @@ function genZScores(): Question {
   const zAsk = choice([-1.5, -1, 0.5, 1, 2]);
   const xv = mu + zAsk * sigma;
   return numeric(
-    `μ = ${mu}, σ = ${sigma}. What x has z = ${zAsk}?`,
+    t(`μ = ${mu}, σ = ${sigma}. What x has z = ${zAsk}?`, `μ = ${mu}, σ = ${sigma}. ¿Qué x tiene z = ${zAsk}?`),
     xv,
     'z_scores',
     0.05,
@@ -359,33 +511,74 @@ function genZScores(): Question {
 function genLiteracy(): Question {
   const items = [
     [
-      'A study finds r = 0.82 between ice cream sales and drowning deaths. The best conclusion is:',
-      'A lurking variable (like heat) may drive both; correlation is not causation.',
-      [
+      t(
+        'A study finds r = 0.82 between ice cream sales and drowning deaths. The best conclusion is:',
+        'Un estudio halla r = 0.82 entre ventas de helado y muertes por ahogamiento. La mejor conclusión es:',
+      ),
+      t(
         'A lurking variable (like heat) may drive both; correlation is not causation.',
-        'Eating ice cream causes drowning.',
-        'Banning ice cream would stop drowning.',
-        'r = 0.82 proves a causal link.',
-      ],
-    ],
-    [
-      'A poll of 12 friends on social media is used to estimate a national opinion. The main problem is:',
-      'The sample is not representative (voluntary / convenience bias).',
+        'Una variable oculta (como el calor) puede impulsar ambas; correlación no es causalidad.',
+      ),
       [
-        'The sample is not representative (voluntary / convenience bias).',
-        'n = 12 is always large enough by the CLT.',
-        'Friends are a stratified sample of the nation.',
-        'Bias is impossible if you compute a mean.',
+        t(
+          'A lurking variable (like heat) may drive both; correlation is not causation.',
+          'Una variable oculta (como el calor) puede impulsar ambas; correlación no es causalidad.',
+        ),
+        t('Eating ice cream causes drowning.', 'Comer helado causa ahogamientos.'),
+        t('Banning ice cream would stop drowning.', 'Prohibir el helado detendría los ahogamientos.'),
+        t('r = 0.82 proves a causal link.', 'r = 0.82 prueba un vínculo causal.'),
       ],
     ],
     [
-      'A histogram of household income is strongly right-skewed. The mean compared with the median is usually:',
-      'Mean > median',
-      ['Mean > median', 'Mean < median', 'Mean = median always', 'The mode equals the mean'],
+      t(
+        'A poll of 12 friends on social media is used to estimate a national opinion. The main problem is:',
+        'Una encuesta a 12 amigos en redes sociales se usa para estimar una opinión nacional. El problema principal es:',
+      ),
+      t(
+        'The sample is not representative (voluntary / convenience bias).',
+        'La muestra no es representativa (sesgo voluntario / por conveniencia).',
+      ),
+      [
+        t(
+          'The sample is not representative (voluntary / convenience bias).',
+          'La muestra no es representativa (sesgo voluntario / por conveniencia).',
+        ),
+        t('n = 12 is always large enough by the CLT.', 'n = 12 siempre es suficientemente grande por el TLC.'),
+        t(
+          'Friends are a stratified sample of the nation.',
+          'Los amigos son una muestra estratificada de la nación.',
+        ),
+        t(
+          'Bias is impossible if you compute a mean.',
+          'El sesgo es imposible si calculas una media.',
+        ),
+      ],
+    ],
+    [
+      t(
+        'A histogram of household income is strongly right-skewed. The mean compared with the median is usually:',
+        'Un histograma del ingreso familiar está fuertemente sesgado a la derecha. La media comparada con la mediana suele ser:',
+      ),
+      t('Mean > median', 'Media > mediana'),
+      [
+        t('Mean > median', 'Media > mediana'),
+        t('Mean < median', 'Media < mediana'),
+        t('Mean = median always', 'Media = mediana siempre'),
+        t('The mode equals the mean', 'La moda es igual a la media'),
+      ],
     ],
   ] as const;
   const [prompt, answer, choices] = choice(items);
-  return mc(prompt, [...choices], answer, 'literacy', 'Watch for bias, confounding, and shape vs center.');
+  return mc(
+    prompt,
+    [...choices],
+    answer,
+    'literacy',
+    t(
+      'Watch for bias, confounding, and shape vs center.',
+      'Cuida el sesgo, la confusión y la forma frente al centro.',
+    ),
+  );
 }
 
 function genProbBasic(): Question {
@@ -393,11 +586,17 @@ function genProbBasic(): Question {
   const k = randInt(1, Math.min(5, n - 1));
   const p = k / n;
   return numeric(
-    `A fair process has ${n} equally likely outcomes. Event A has ${k} of them. Find P(A).`,
+    t(
+      `A fair process has ${n} equally likely outcomes. Event A has ${k} of them. Find P(A).`,
+      `Un proceso justo tiene ${n} resultados igualmente posibles. El evento A tiene ${k} de ellos. Halla P(A).`,
+    ),
     p,
     'prob_basic',
     0.01,
-    'Classical probability: favorable ÷ total, for equally likely outcomes.',
+    t(
+      'Classical probability: favorable ÷ total, for equally likely outcomes.',
+      'Probabilidad clásica: favorables ÷ total, para resultados igualmente posibles.',
+    ),
     `P(A) = ${k}/${n}`,
     calc(`${k} ÷ ${n} =`, `=${k}/${n}`),
   );
@@ -410,12 +609,15 @@ function genProbCompound(): Question {
   if (ask === 'and') {
     const ans = num(pA * pB);
     return numeric(
-      `A and B are independent with P(A) = ${pA} and P(B) = ${pB}. Find P(A and B).`,
+      t(
+        `A and B are independent with P(A) = ${pA} and P(B) = ${pB}. Find P(A and B).`,
+        `A y B son independientes con P(A) = ${pA} y P(B) = ${pB}. Halla P(A y B).`,
+      ),
       ans,
       'prob_compound',
       0.01,
-      'Independence: multiply.',
-      `P(A and B) = ${pA} × ${pB}`,
+      t('Independence: multiply.', 'Independencia: multiplica.'),
+      t(`P(A and B) = ${pA} × ${pB}`, `P(A y B) = ${pA} × ${pB}`),
       calc(`${pA} × ${pB} =`, `=${pA}*${pB}`),
     );
   }
@@ -423,21 +625,27 @@ function genProbCompound(): Question {
     const both = num(pA * pB);
     const ans = num(pA + pB - both);
     return numeric(
-      `Independent events: P(A) = ${pA}, P(B) = ${pB}. Find P(A or B).`,
+      t(
+        `Independent events: P(A) = ${pA}, P(B) = ${pB}. Find P(A or B).`,
+        `Eventos independientes: P(A) = ${pA}, P(B) = ${pB}. Halla P(A o B).`,
+      ),
       ans,
       'prob_compound',
       0.01,
-      'P(A or B) = P(A) + P(B) − P(A and B).',
-      `P(A or B) = ${pA} + ${pB} − ${both}`,
+      t(
+        'P(A or B) = P(A) + P(B) − P(A and B).',
+        'P(A o B) = P(A) + P(B) − P(A y B).',
+      ),
+      t(`P(A or B) = ${pA} + ${pB} − ${both}`, `P(A o B) = ${pA} + ${pB} − ${both}`),
       calc(`${pA} + ${pB} − ${both} =`),
     );
   }
   return numeric(
-    `P(A) = ${pA}. Find P(Aᶜ).`,
+    t(`P(A) = ${pA}. Find P(Aᶜ).`, `P(A) = ${pA}. Halla P(Aᶜ).`),
     num(1 - pA),
     'prob_compound',
     0.01,
-    'Complement: 1 − P(A).',
+    t('Complement: 1 − P(A).', 'Complemento: 1 − P(A).'),
     `1 − ${pA}`,
     calc(`1 − ${pA} =`),
   );
@@ -451,22 +659,28 @@ function genDiscrete(): Question {
   const ask = choice(['binom', 'expect']);
   if (ask === 'binom') {
     return numeric(
-      `X ~ Binomial(n = ${n}, p = ${p}). Find P(X = ${k}). Round to 4 decimals.`,
+      t(
+        `X ~ Binomial(n = ${n}, p = ${p}). Find P(X = ${k}). Round to 4 decimals.`,
+        `X ~ Binomial(n = ${n}, p = ${p}). Halla P(X = ${k}). Redondea a 4 decimales.`,
+      ),
       num(pk, 4),
       'discrete',
       0.002,
       'P(X = k) = C(n,k) p^k (1−p)^{n−k}.',
-      `C(${n},${k}) = ${nCk(n, k)}; then multiply by ${p}^${k} (1−${p})^${n - k}.`,
+      t(
+        `C(${n},${k}) = ${nCk(n, k)}; then multiply by ${p}^${k} (1−${p})^${n - k}.`,
+        `C(${n},${k}) = ${nCk(n, k)}; luego multiplica por ${p}^${k} (1−${p})^${n - k}.`,
+      ),
       calc(`nCr(${n},${k}) × ${p}^${k} × ${(1 - p)}^${n - k} =`, `=BINOM.DIST(${k},${n},${p},FALSE)`),
     );
   }
   const mu = n * p;
   return numeric(
-    `X ~ Binomial(n = ${n}, p = ${p}). Find E(X).`,
+    t(`X ~ Binomial(n = ${n}, p = ${p}). Find E(X).`, `X ~ Binomial(n = ${n}, p = ${p}). Halla E(X).`),
     mu,
     'discrete',
     0.01,
-    'For a binomial, E(X) = np.',
+    t('For a binomial, E(X) = np.', 'Para una binomial, E(X) = np.'),
     `E(X) = ${n} × ${p}`,
     calc(`${n} × ${p} =`),
   );
@@ -480,12 +694,18 @@ function genNormal(): Question {
     const lo = mu - 2 * sigma;
     const hi = mu + 2 * sigma;
     return numeric(
-      `Mound-shaped with μ = ${mu}, σ = ${sigma}. About what percent of values lie between ${lo} and ${hi}? (Empirical rule)`,
+      t(
+        `Mound-shaped with μ = ${mu}, σ = ${sigma}. About what percent of values lie between ${lo} and ${hi}? (Empirical rule)`,
+        `Forma acampanada con μ = ${mu}, σ = ${sigma}. ¿Aproximadamente qué porcentaje de valores está entre ${lo} y ${hi}? (Regla empírica)`,
+      ),
       95,
       'normal',
       0.5,
-      'About 95% lie within 2 standard deviations of the mean.',
-      `${lo} and ${hi} are μ ± 2σ.`,
+      t(
+        'About 95% lie within 2 standard deviations of the mean.',
+        'Cerca del 95% queda a 2 desviaciones estándar de la media.',
+      ),
+      t(`${lo} and ${hi} are μ ± 2σ.`, `${lo} y ${hi} son μ ± 2σ.`),
       calc(''),
       '%',
     );
@@ -493,11 +713,22 @@ function genNormal(): Question {
   const z = 1;
   const x = mu + z * sigma;
   return mc(
-    `μ = ${mu}, σ = ${sigma}. The value x = ${x} is how many standard deviations from the mean?`,
-    ['1 above', '1 below', '2 above', '0 (it is the mean)'],
-    '1 above',
+    t(
+      `μ = ${mu}, σ = ${sigma}. The value x = ${x} is how many standard deviations from the mean?`,
+      `μ = ${mu}, σ = ${sigma}. ¿El valor x = ${x} está a cuántas desviaciones estándar de la media?`,
+    ),
+    [
+      t('1 above', '1 por encima'),
+      t('1 below', '1 por debajo'),
+      t('2 above', '2 por encima'),
+      t('0 (it is the mean)', '0 (es la media)'),
+    ],
+    t('1 above', '1 por encima'),
     'normal',
-    'Distance in σ units is the z-score: (x − μ)/σ.',
+    t(
+      'Distance in σ units is the z-score: (x − μ)/σ.',
+      'La distancia en unidades de σ es la puntuación z: (x − μ)/σ.',
+    ),
   );
 }
 
@@ -508,11 +739,14 @@ function genClt(): Question {
   const ask = choice(['se', 'z']);
   if (ask === 'se') {
     return numeric(
-      `σ = ${sigma} and n = ${n}. What is the standard error of x̄?`,
+      t(
+        `σ = ${sigma} and n = ${n}. What is the standard error of x̄?`,
+        `σ = ${sigma} y n = ${n}. ¿Cuál es el error estándar de x̄?`,
+      ),
       se,
       'clt',
       0.05,
-      'SE(x̄) = σ / √n.',
+      t('SE(x̄) = σ / √n.', 'EE(x̄) = σ / √n.'),
       `${sigma} / √${n}`,
       calc(`${sigma} ÷ √(${n}) =`, `=${sigma}/SQRT(${n})`),
     );
@@ -521,12 +755,18 @@ function genClt(): Question {
   const xbar = mu + choice([-se, se, 2 * se]);
   const z = (xbar - mu) / se;
   return numeric(
-    `μ = ${mu}, σ = ${sigma}, n = ${n}. A sample mean is x̄ = ${num(xbar, 2)}. Find the z-score of x̄.`,
+    t(
+      `μ = ${mu}, σ = ${sigma}, n = ${n}. A sample mean is x̄ = ${num(xbar, 2)}. Find the z-score of x̄.`,
+      `μ = ${mu}, σ = ${sigma}, n = ${n}. Una media muestral es x̄ = ${num(xbar, 2)}. Halla la puntuación z de x̄.`,
+    ),
     z,
     'clt',
     0.08,
     'z = (x̄ − μ) / (σ/√n).',
-    `SE = ${num(se, 4)}; z = (${num(xbar, 2)} − ${mu}) / SE`,
+    t(
+      `SE = ${num(se, 4)}; z = (${num(xbar, 2)} − ${mu}) / SE`,
+      `EE = ${num(se, 4)}; z = (${num(xbar, 2)} − ${mu}) / EE`,
+    ),
     calc(`(${num(xbar, 2)} − ${mu}) ÷ (${sigma}÷√${n}) =`),
   );
 }
@@ -540,23 +780,32 @@ function genCi(): Question {
   const ask = choice(['me', 'low']);
   if (ask === 'me') {
     return numeric(
-      `A 95% CI uses z* = 1.96. If n = ${n}, s = ${s}, find the margin of error for a mean (use s for σ).`,
+      t(
+        `A 95% CI uses z* = 1.96. If n = ${n}, s = ${s}, find the margin of error for a mean (use s for σ).`,
+        `Un IC del 95% usa z* = 1.96. Si n = ${n}, s = ${s}, halla el margen de error para una media (usa s por σ).`,
+      ),
       me,
       'ci',
       0.05,
-      'ME = z* · (s / √n).',
+      t('ME = z* · (s / √n).', 'ME = z* · (s / √n).'),
       `ME = 1.96 × (${s}/√${n})`,
       calc(`1.96 × (${s}÷√${n}) =`, `=1.96*${s}/SQRT(${n})`),
     );
   }
   const low = xbar - me;
   return numeric(
-    `x̄ = ${xbar}, n = ${n}, s = ${s}, 95% (z* = 1.96). Find the lower endpoint of the CI for μ.`,
+    t(
+      `x̄ = ${xbar}, n = ${n}, s = ${s}, 95% (z* = 1.96). Find the lower endpoint of the CI for μ.`,
+      `x̄ = ${xbar}, n = ${n}, s = ${s}, 95% (z* = 1.96). Halla el extremo inferior del IC para μ.`,
+    ),
     low,
     'ci',
     0.08,
-    'Lower = x̄ − z* · (s/√n).',
-    `ME = 1.96×(${s}/√${n}); lower = ${xbar} − ME`,
+    t('Lower = x̄ − z* · (s/√n).', 'Inferior = x̄ − z* · (s/√n).'),
+    t(
+      `ME = 1.96×(${s}/√${n}); lower = ${xbar} − ME`,
+      `ME = 1.96×(${s}/√${n}); inferior = ${xbar} − ME`,
+    ),
     calc(`${xbar} − 1.96×(${s}÷√${n}) =`),
   );
 }
@@ -570,7 +819,10 @@ function genHtOne(): Question {
   const ask = choice(['z', 'h0']);
   if (ask === 'z') {
     return numeric(
-      `Test H₀: μ = ${mu0} vs Hₐ: μ ≠ ${mu0}. n = ${n}, σ = ${sigma}, x̄ = ${num(xbar, 2)}. Compute the z test statistic.`,
+      t(
+        `Test H₀: μ = ${mu0} vs Hₐ: μ ≠ ${mu0}. n = ${n}, σ = ${sigma}, x̄ = ${num(xbar, 2)}. Compute the z test statistic.`,
+        `Prueba H₀: μ = ${mu0} vs Hₐ: μ ≠ ${mu0}. n = ${n}, σ = ${sigma}, x̄ = ${num(xbar, 2)}. Calcula el estadístico z.`,
+      ),
       z,
       'ht_one',
       0.08,
@@ -580,31 +832,64 @@ function genHtOne(): Question {
     );
   }
   return mc(
-    'In a test of H₀: μ = 100 vs Hₐ: μ > 100, a tiny p-value means:',
+    t(
+      'In a test of H₀: μ = 100 vs Hₐ: μ > 100, a tiny p-value means:',
+      'En una prueba de H₀: μ = 100 vs Hₐ: μ > 100, un valor p muy pequeño significa:',
+    ),
     [
-      'The data are unusual if H₀ is true — evidence against H₀',
-      'H₀ is definitely true',
-      'The sample was biased for sure',
-      'μ must equal 100',
+      t(
+        'The data are unusual if H₀ is true — evidence against H₀',
+        'Los datos son inusuales si H₀ es verdadera — evidencia contra H₀',
+      ),
+      t('H₀ is definitely true', 'H₀ es definitivamente verdadera'),
+      t('The sample was biased for sure', 'La muestra estaba sesgada con certeza'),
+      t('μ must equal 100', 'μ debe ser igual a 100'),
     ],
-    'The data are unusual if H₀ is true — evidence against H₀',
+    t(
+      'The data are unusual if H₀ is true — evidence against H₀',
+      'Los datos son inusuales si H₀ es verdadera — evidencia contra H₀',
+    ),
     'ht_one',
-    'A small p-value is evidence against the null, not proof of the alternative in a logical-certainty sense.',
+    t(
+      'A small p-value is evidence against the null, not proof of the alternative in a logical-certainty sense.',
+      'Un valor p pequeño es evidencia contra la nula, no una prueba de certeza lógica de la alternativa.',
+    ),
   );
 }
 
 function genHtTwo(): Question {
   return mc(
-    'Paired data (before/after the same 20 missionaries) should be analyzed with:',
+    t(
+      'Paired data (before/after the same 20 missionaries) should be analyzed with:',
+      'Datos pareados (antes/después de los mismos 20 misioneros) deben analizarse con:',
+    ),
     [
-      'A paired (matched) t procedure on the differences',
-      'Two independent two-sample z tests on unrelated groups',
-      'A chi-square goodness-of-fit with 20 categories',
-      'A pie chart of the differences only',
+      t(
+        'A paired (matched) t procedure on the differences',
+        'Un procedimiento t pareado (emparejado) sobre las diferencias',
+      ),
+      t(
+        'Two independent two-sample z tests on unrelated groups',
+        'Dos pruebas z independientes de dos muestras en grupos no relacionados',
+      ),
+      t(
+        'A chi-square goodness-of-fit with 20 categories',
+        'Una prueba de bondad de ajuste chi-cuadrado con 20 categorías',
+      ),
+      t(
+        'A pie chart of the differences only',
+        'Una gráfica circular solo de las diferencias',
+      ),
     ],
-    'A paired (matched) t procedure on the differences',
+    t(
+      'A paired (matched) t procedure on the differences',
+      'Un procedimiento t pareado (emparejado) sobre las diferencias',
+    ),
     'ht_two',
-    'The same units measured twice are dependent — use differences.',
+    t(
+      'The same units measured twice are dependent — use differences.',
+      'Las mismas unidades medidas dos veces son dependientes — usa las diferencias.',
+    ),
   );
 }
 
@@ -616,26 +901,47 @@ function genChi(): Question {
     const n = 100;
     const exp = (row * (col * n)) / n;
     return numeric(
-      `In a 2×2 table, a row total is ${row} and a column total is ${col * n} out of n = ${n}. Expected count for that cell?`,
+      t(
+        `In a 2×2 table, a row total is ${row} and a column total is ${col * n} out of n = ${n}. Expected count for that cell?`,
+        `En una tabla 2×2, un total de fila es ${row} y un total de columna es ${col * n} de n = ${n}. ¿Conteo esperado de esa celda?`,
+      ),
       exp,
       'chi_square',
       0.05,
-      'Expected = (row total)(column total) / n.',
+      t('Expected = (row total)(column total) / n.', 'Esperado = (total de fila)(total de columna) / n.'),
       `(${row})(${col * n}) / ${n}`,
       calc(`(${row}×${col * n}) ÷ ${n} =`),
     );
   }
   return mc(
-    'A chi-square test of independence is used when:',
+    t(
+      'A chi-square test of independence is used when:',
+      'Una prueba de independencia chi-cuadrado se usa cuando:',
+    ),
     [
-      'Two categorical variables are displayed in a two-way table',
-      'You have one quantitative variable and want a mean CI',
-      'You compare two means with paired numeric data',
-      'You need a z-score for a single x',
+      t(
+        'Two categorical variables are displayed in a two-way table',
+        'Dos variables categóricas se muestran en una tabla de doble entrada',
+      ),
+      t(
+        'You have one quantitative variable and want a mean CI',
+        'Tienes una variable cuantitativa y quieres un IC para la media',
+      ),
+      t(
+        'You compare two means with paired numeric data',
+        'Comparas dos medias con datos numéricos pareados',
+      ),
+      t('You need a z-score for a single x', 'Necesitas una puntuación z para un solo x'),
     ],
-    'Two categorical variables are displayed in a two-way table',
+    t(
+      'Two categorical variables are displayed in a two-way table',
+      'Dos variables categóricas se muestran en una tabla de doble entrada',
+    ),
     'chi_square',
-    'Independence: categorical vs categorical in a contingency table.',
+    t(
+      'Independence: categorical vs categorical in a contingency table.',
+      'Independencia: categórica vs categórica en una tabla de contingencia.',
+    ),
   );
 }
 
@@ -648,7 +954,10 @@ function genRegression(): Question {
     const y2 = y1 + choice([4, 8, 12, -4]);
     const m = (y2 - y1) / (x2 - x1);
     return numeric(
-      `A line through (${x1}, ${y1}) and (${x2}, ${y2}) has slope m. Find m.`,
+      t(
+        `A line through (${x1}, ${y1}) and (${x2}, ${y2}) has slope m. Find m.`,
+        `Una recta por (${x1}, ${y1}) y (${x2}, ${y2}) tiene pendiente m. Halla m.`,
+      ),
       m,
       'regression',
       0.05,
@@ -659,35 +968,53 @@ function genRegression(): Question {
   }
   if (ask === 'r') {
     return mc(
-      'If r = −0.91 for hours of sleep vs. mistakes on a quiz, this means:',
+      t(
+        'If r = −0.91 for hours of sleep vs. mistakes on a quiz, this means:',
+        'Si r = −0.91 para horas de sueño frente a errores en un cuestionario, esto significa:',
+      ),
       [
-        'A strong negative linear association',
-        'Sleep causes mistakes',
-        'Almost no linear association',
-        'A strong positive linear association',
+        t('A strong negative linear association', 'Una asociación lineal negativa fuerte'),
+        t('Sleep causes mistakes', 'Dormir causa errores'),
+        t('Almost no linear association', 'Casi ninguna asociación lineal'),
+        t('A strong positive linear association', 'Una asociación lineal positiva fuerte'),
       ],
-      'A strong negative linear association',
+      t('A strong negative linear association', 'Una asociación lineal negativa fuerte'),
       'regression',
-      '|r| near 1 is strong; the sign is the direction. Causation needs more than r.',
+      t(
+        '|r| near 1 is strong; the sign is the direction. Causation needs more than r.',
+        '|r| cerca de 1 es fuerte; el signo es la dirección. La causalidad necesita más que r.',
+      ),
     );
   }
   const r = choice([0.4, 0.5, 0.6, 0.8, 0.9]);
   return numeric(
-    `If the correlation is r = ${r}, what is r²?`,
+    t(`If the correlation is r = ${r}, what is r²?`, `Si la correlación es r = ${r}, ¿cuál es r²?`),
     num(r * r),
     'regression',
     0.01,
-    'Square r. That is the fraction of variation in y explained by the line.',
+    t(
+      'Square r. That is the fraction of variation in y explained by the line.',
+      'Eleva r al cuadrado. Esa es la fracción de variación de y explicada por la recta.',
+    ),
     `r² = (${r})²`,
     calc(`${r}² =`),
   );
 }
 
 function genFlash(topic: TopicId): Question | null {
-  const bank = FLASHCARDS.filter((f) => f.topic === topic);
+  const bank = localizedFlashcards(loc).filter((f) => f.topic === topic);
   if (!bank.length) return null;
   const card = choice(bank);
-  return mc(card.front, card.choices, card.back, topic, 'Recall the formula or definition; then check units and conditions.');
+  return mc(
+    card.front,
+    card.choices,
+    card.back,
+    topic,
+    t(
+      'Recall the formula or definition; then check units and conditions.',
+      'Recuerda la fórmula o definición; luego revisa unidades y condiciones.',
+    ),
+  );
 }
 
 const GENERATORS: Record<TopicId, () => Question> = {
@@ -710,7 +1037,8 @@ const GENERATORS: Record<TopicId, () => Question> = {
   regression: genRegression,
 };
 
-export function generateQuestion(topic: TopicId, flash = false): Question {
+export function generateQuestion(topic: TopicId, flash = false, locale: Locale = 'en'): Question {
+  loc = locale;
   if (flash) {
     const q = genFlash(topic);
     if (q) return q;

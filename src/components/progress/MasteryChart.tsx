@@ -1,4 +1,7 @@
 import type { TopicId } from '../../data/catalog';
+import { useI18n } from '../../context/LanguageContext';
+import { topicLabel } from '../../i18n/catalog';
+import { fmt } from '../../i18n/locale';
 import type { MasteryView } from '../../state/progress';
 import styles from './MasteryChart.module.css';
 
@@ -43,6 +46,7 @@ export function MasteryChart({
   compact?: boolean;
   onTopicClick?: (id: TopicId) => void;
 }) {
+  const { locale, t } = useI18n();
   const n = view.slices.length || 1;
   const size = compact ? 88 : 220;
   const cx = size / 2;
@@ -59,7 +63,11 @@ export function MasteryChart({
           className={styles.svg}
           viewBox={`0 0 ${size} ${size}`}
           role="img"
-          aria-label={`Overall mastery ${formatPct(view.overall)} percent. ${view.mastered} of ${view.total} topics mastered.`}
+          aria-label={fmt(t.chartAria, {
+            pct: formatPct(view.overall),
+            mastered: view.mastered,
+            total: view.total,
+          })}
         >
           {view.slices.map((slice, i) => {
             const a0 = i * sweep + gap / 2;
@@ -87,7 +95,7 @@ export function MasteryChart({
                     strokeWidth={compact ? 0.6 : 0.75}
                   >
                     <title>
-                      {slice.label}: {slice.unaided}/{slice.needed}
+                      {topicLabel(slice.id, locale)}: {slice.unaided}/{slice.needed}
                     </title>
                   </path>
                 ) : null}
@@ -111,12 +119,16 @@ export function MasteryChart({
             className={styles.pieSub}
             fontSize={compact ? 6.5 : 10}
           >
-            overall
+            {t.overall}
           </text>
         </svg>
         {!compact ? (
           <p className={styles.summary}>
-            {view.mastered} of {view.total} topics mastered · {view.unaidedNeeded} unaided each
+            {fmt(t.chartSummary, {
+              mastered: view.mastered,
+              total: view.total,
+              needed: view.unaidedNeeded,
+            })}
           </p>
         ) : null}
       </div>
@@ -131,7 +143,7 @@ export function MasteryChart({
                   <i style={{ background: slice.color }} />
                   <span>
                     {slice.mastered ? '✓ ' : ''}
-                    {slice.label}
+                    {topicLabel(slice.id, locale)}
                   </span>
                   <em>
                     {slice.unaided}/{slice.needed} · {pct}%
@@ -149,12 +161,12 @@ export function MasteryChart({
                     type="button"
                     className={styles.topicBtn}
                     onClick={() => onTopicClick(slice.id)}
-                    title={slice.label}
+                    title={topicLabel(slice.id, locale)}
                   >
                     {inner}
                   </button>
                 ) : (
-                  <div className={styles.topicBtn} title={slice.label}>
+                  <div className={styles.topicBtn} title={topicLabel(slice.id, locale)}>
                     {inner}
                   </div>
                 )}

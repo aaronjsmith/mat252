@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import type { Assessment, WeekGroup as WeekGroupType } from '../../data/catalog';
+import { useI18n } from '../../context/LanguageContext';
+import { weekText } from '../../i18n/catalog';
+import { fmt } from '../../i18n/locale';
 import { collapseKey, readWeekMasteryView } from '../../state/progress';
 import { MasteryChart } from '../progress/MasteryChart';
 import { QuizCard } from './QuizCard';
@@ -25,6 +28,8 @@ export function WeekGroup({
   week: WeekGroupType;
   quizzes: Assessment[];
 }) {
+  const { locale, t } = useI18n();
+  const text = weekText(week, locale);
   const isOverview = week.id === 'overview';
   const weekMastery = readWeekMasteryView(week.id);
   const [collapsed, setCollapsed] = useState(() =>
@@ -46,20 +51,26 @@ export function WeekGroup({
       <header className={styles.head}>
         {isOverview ? (
           <div>
-            <span className={styles.title}>{week.title}</span>
-            <span className={styles.blurb}>{week.blurb}</span>
+            <span className={styles.title}>{text.title}</span>
+            <span className={styles.blurb}>{text.blurb}</span>
           </div>
         ) : (
           <button type="button" className={styles.toggle} onClick={toggle} aria-expanded={!collapsed}>
             <span className={styles.chevron} aria-hidden="true" />
             <span>
-              <span className={styles.title}>{week.title}</span>
-              <span className={styles.blurb}>{week.blurb}</span>
+              <span className={styles.title}>{text.title}</span>
+              <span className={styles.blurb}>{text.blurb}</span>
             </span>
           </button>
         )}
         {weekMastery.total > 0 ? (
-          <div className={styles.ring} title={`${weekMastery.mastered}/${weekMastery.total} topics mastered`}>
+          <div
+            className={styles.ring}
+            title={fmt(t.weekMasteryTitle, {
+              mastered: weekMastery.mastered,
+              total: weekMastery.total,
+            })}
+          >
             <MasteryChart view={weekMastery} compact />
           </div>
         ) : null}

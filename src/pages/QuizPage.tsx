@@ -1,17 +1,18 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TitleBar } from '../components/header/TitleBar';
-import { ThemeToggle } from '../components/header/Toggles';
+import { LanguageToggle, ThemeToggle } from '../components/header/Toggles';
 import { StatusBar } from '../components/StatusBar';
 import {
   ASSESSMENTS,
   HINT_CREDIT,
   MASTER,
   RETRY_CREDIT,
-  THEMES,
-  TOPIC_LABEL,
   getAssessment,
   type TopicId,
 } from '../data/catalog';
+import { useI18n } from '../context/LanguageContext';
+import { assessmentText, themeCopy, topicLabel } from '../i18n/catalog';
+import { fmt } from '../i18n/locale';
 import { checkAnswer, generateQuestion, type Question } from '../questions/generate';
 import { MasteryChart } from '../components/progress/MasteryChart';
 import {
@@ -47,8 +48,10 @@ function pickTopic(topics: TopicId[], progressId: string, preferUnmastered: bool
 }
 
 export function QuizPage() {
+  const { locale, t } = useI18n();
   const assessment = getAssessment(param('a')) ?? getAssessment('overview')!;
-  const theme = THEMES[assessment.theme];
+  const copy = assessmentText(assessment, locale);
+  const theme = themeCopy(assessment.theme, locale);
   const initialMode = (param('mode') as Mode | null) || 'smart';
   const [mode, setMode] = useState<Mode>(initialMode);
   const [q, setQ] = useState<Question | null>(null);
@@ -70,6 +73,7 @@ export function QuizPage() {
 
   const summary = useMemo(() => readProgressSummary(assessment), [assessment, tick]);
   const mastery = useMemo(() => readMasteryView(assessment), [assessment, tick]);
+  const bossRef = useRef(boss);
 
   const nextQuestion = useCallback(
     (m: Mode, bossState?: typeof boss) => {
@@ -87,7 +91,7 @@ export function QuizPage() {
       } else {
         topic = m;
       }
-      const nq = generateQuestion(topic, flash);
+      const nq = generateQuestion(topic, flash, locale);
       setQ(nq);
       setPicked('');
       setHints(m === 'teachme' ? 3 : 0);
@@ -97,12 +101,16 @@ export function QuizPage() {
       setFeedback(null);
       setRetry(false);
     },
-    [assessment],
+    [assessment, locale],
   );
 
   useEffect(() => {
-    nextQuestion(mode);
-  }, [mode, nextQuestion]);
+    bossRef.current = boss;
+  }, [boss]);
+
+  useEffect(() => {
+    nextQuestion(mode, bossRef.current ?? undefined);
+  }, [mode, locale, assessment, nextQuestion]);
 
   useEffect(() => {
     if (allMastered(assessment, readProgress(assessment.id)) && !readProgress(assessment.id).final_boss_cleared) {
@@ -168,7 +176,7 @@ export function QuizPage() {
       setFeedback({
         ok: false,
         text: theme.miss
-          .replace('{topic}', TOPIC_LABEL[q.topic])
+          .replace('{topic}', topicLabel(q.topic, locale))
           .replace('{progress}', `${unaided}/${MASTER}`),
       });
       nextQuestion('finalboss', boss);
@@ -182,20 +190,23 @@ export function QuizPage() {
       setFeedback({
         ok: true,
         text: unaided
-          ? `Correct · unaided (+1 mastery, now ${Math.min(MASTER, topicUnaided(readProgress(assessment.id), q.topic))}/${MASTER})`
-          : `Correct · credit ${Math.round(credit * 100)}% (hints used, no mastery)`,
+          ? fmt(t.correctUnaided, {
+              n: Math.min(MASTER, topicUnaided(readProgress(assessment.id), q.topic)),
+              master: MASTER,
+            })
+          : fmt(t.correctCredit, { pct: Math.round(credit * 100) }),
       });
     } else {
       setRetry(true);
       setFeedback({
         ok: false,
-        text: `Not quite. Try again for ${Math.round(RETRY_CREDIT * 100)}% credit, or skip.`,
+        text: fmt(t.notQuite, { pct: Math.round(RETRY_CREDIT * 100) }),
       });
     }
   }
 
   if (!q) {
-    return <div className={styles.page}>Loading…</div>;
+    return <div className={styles.page}>{t.loading}</div>;
   }
 
   const noHints = Boolean(boss?.active);
@@ -203,44 +214,49 @@ export function QuizPage() {
   return (
     <div className={styles.page}>
       <TitleBar
-        title={assessment.title}
+        title={copy.title}
         subtitle={`MAT 252 · ${theme.name}`}
         backHref="/"
+        backLabel={t.backQuizzes}
       />
 
       <div className={styles.toolbar}>
         <div className={styles.stats}>
           <div className={styles.stat}>
             <span className={styles.statVal}>{summary.accuracy != null ? `${summary.accuracy}%` : '—'}</span>
-            <span className={styles.statLbl}>Grade</span>
+            <span className={styles.statLbl}>{t.grade}</span>
           </div>
           <div className={styles.stat}>
             <span className={styles.statVal}>{summary.mastered}/{summary.total}</span>
-            <span className={styles.statLbl}>Mastered</span>
+            <span className={styles.statLbl}>{t.mastered}</span>
           </div>
           <div className={styles.stat}>
             <span className={styles.statVal}>{summary.attempted}</span>
-            <span className={styles.statLbl}>Answered</span>
+            <span className={styles.statLbl}>{t.answered}</span>
           </div>
         </div>
         <span className={styles.spacer} />
-        <ThemeToggle />
+        <div className={styles.toggles}>
+          <LanguageToggle />
+          <ThemeToggle />
+        </div>
       </div>
 
       <main className={styles.body}>
         <aside className={styles.topics}>
-          <h2>Topics</h2>
+          <h2>{t.topics}</h2>
           <p className={styles.blurb}>
-            Mastery = <strong>10 correct with no hints</strong> per topic. Hints never reveal the
-            answer — only how to work. Penalty if correct: Hint 1 −25%, Hint 2 −50%, Hint 3 −75%.
+            {t.topicsBlurbBefore}
+            <strong>{t.topicsBlurbStrong}</strong>
+            {t.topicsBlurbAfter}
           </p>
           {(
             [
-              ['smart', 'Smart pick'],
-              ['all', 'All topics'],
-              ['teachme', 'Teach me'],
-              ...(assessment.nourish ? [['nourish', 'Nourish and Strengthen'] as const] : []),
-              ...(assessment.flashcards ? [['flashcards', 'Formula flashcards'] as const] : []),
+              ['smart', t.smartPick],
+              ['all', t.allTopics],
+              ['teachme', t.teachMe],
+              ...(assessment.nourish ? [['nourish', t.nourish] as const] : []),
+              ...(assessment.flashcards ? [['flashcards', t.flashcards] as const] : []),
             ] as [Mode, string][]
           ).map(([id, label]) => (
             <button
@@ -278,7 +294,7 @@ export function QuizPage() {
                 setMode(tid);
               }}
             >
-              <span>{TOPIC_LABEL[tid]}</span>
+              <span>{topicLabel(tid, locale)}</span>
               <span className={styles.mastery}>{effectiveTopicUnaided(assessment, tid)}/{MASTER}</span>
             </button>
           ))}
@@ -289,10 +305,10 @@ export function QuizPage() {
             <div className={styles.banner}>
               <strong>{theme.name}.</strong> {theme.invite}{' '}
               <button type="button" className={styles.linkish} onClick={() => startBoss(false)}>
-                Fight
+                {t.fight}
               </button>
               <button type="button" className={styles.linkish} onClick={() => setInvite(false)}>
-                Not now
+                {t.notNow}
               </button>
             </div>
           )}
@@ -301,17 +317,17 @@ export function QuizPage() {
               {theme.progress
                 .replace('{current}', String(boss.index + 1))
                 .replace('{total}', String(boss.queue.length))
-                .replace('{topic}', TOPIC_LABEL[q.topic])}
+                .replace('{topic}', topicLabel(q.topic, locale))}
             </p>
           )}
           <div className={styles.meta}>
             {boss && <span className={styles.bossFace}>{theme.emoji}</span>}
-            <span className={styles.pill}>{TOPIC_LABEL[q.topic]}</span>
+            <span className={styles.pill}>{topicLabel(q.topic, locale)}</span>
           </div>
           <h1 className={styles.prompt}>{q.prompt}</h1>
 
           {q.type === 'mc' && q.choices && (
-            <div className={styles.choices} role="group" aria-label="Choices">
+            <div className={styles.choices} role="group" aria-label={t.choices}>
               {q.choices.map((c) => (
                 <button
                   key={c}
@@ -331,8 +347,8 @@ export function QuizPage() {
               inputMode="decimal"
               value={picked}
               onChange={(e) => setPicked(e.target.value)}
-              placeholder={q.unit ? `Number (${q.unit})` : 'Number'}
-              aria-label="Numeric answer"
+              placeholder={q.unit ? fmt(t.numberPlaceholderUnit, { unit: q.unit }) : t.numberPlaceholder}
+              aria-label={t.numericAria}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') onCheck();
               }}
@@ -343,21 +359,21 @@ export function QuizPage() {
             <>
               <div className={styles.hintRow}>
                 <button type="button" className={styles.linkish} disabled={show1} onClick={() => { setShow1(true); setHints((h) => Math.max(h, 1)); }}>
-                  Hint 1 · approach (−25%)
+                  {t.hint1}
                 </button>
                 <button type="button" className={styles.linkish} disabled={!show1 || show2} onClick={() => { setShow2(true); setHints((h) => Math.max(h, 2)); }}>
-                  Hint 2 · setup (−50%)
+                  {t.hint2}
                 </button>
                 <button type="button" className={styles.linkish} disabled={!show2 || show3} onClick={() => { setShow3(true); setHints((h) => Math.max(h, 3)); }}>
-                  Calculator / Excel (−75%)
+                  {t.hint3}
                 </button>
               </div>
               {show1 && <div className={styles.hintBox}>{q.hint}</div>}
               {show2 && q.setup && <div className={styles.hintBox}>{q.setup}</div>}
               {show3 && (q.calc.ti || q.calc.excel) && (
                 <div className={styles.hintBox}>
-                  {q.calc.ti ? `TI / Casio: ${q.calc.ti}\n` : ''}
-                  {q.calc.excel ? `Excel: ${q.calc.excel}` : ''}
+                  {q.calc.ti ? `${t.calcTi}${q.calc.ti}\n` : ''}
+                  {q.calc.excel ? `${t.calcExcel}${q.calc.excel}` : ''}
                 </div>
               )}
             </>
@@ -366,29 +382,30 @@ export function QuizPage() {
           {feedback && (
             <div className={`${styles.feedback} ${feedback.ok ? styles.ok : styles.bad}`}>
               {feedback.text}
-              {feedback.ok && q.type === 'numeric' ? ` · answer ${q.answer}` : ''}
+              {feedback.ok && q.type === 'numeric' ? fmt(t.answerSuffix, { answer: String(q.answer) }) : ''}
             </div>
           )}
 
           <div className={styles.actions}>
             <button type="button" className={styles.primary} onClick={onCheck} disabled={!picked}>
-              {retry ? 'Check again · 5%' : 'Check'}
+              {retry ? t.checkAgain : t.check}
             </button>
             <button
               type="button"
               className={styles.ghost}
               onClick={() => nextQuestion(mode, boss ?? undefined)}
             >
-              {retry ? 'Skip · 0%' : 'Remix'}
+              {retry ? t.skip : t.remix}
             </button>
           </div>
         </section>
 
         <aside className={styles.mastery}>
-          <h2>Mastery</h2>
+          <h2>{t.mastery}</h2>
           <p className={styles.blurb}>
-            Need <strong>10 unaided corrects</strong> per topic. Hints never count. Slice fill is
-            unaided progress toward 10.
+            {t.masteryBlurbBefore}
+            <strong>{t.masteryBlurbStrong}</strong>
+            {t.masteryBlurbAfter}
           </p>
           <MasteryChart
             view={mastery}
