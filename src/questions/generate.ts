@@ -383,24 +383,61 @@ function genGraphs(): Question {
   const ask = choice(['rel', 'count', 'tallest', 'shape', 'which'] as const);
 
   if (ask === 'which') {
-    return mc(
-      t(
-        'Which display is best for a single quantitative variable’s shape (univariate)?',
-        '¿Qué gráfica es mejor para la forma de una sola variable cuantitativa (univariada)?',
-      ),
+    const items = [
       [
+        t(
+          'Which display is best for a single quantitative variable’s shape (univariate)?',
+          '¿Qué gráfica es mejor para la forma de una sola variable cuantitativa (univariada)?',
+        ),
         t('Histogram', 'Histograma'),
-        t('Pie chart of categories', 'Gráfica circular de categorías'),
-        t('Scatterplot', 'Diagrama de dispersión'),
-        t('Two-way table', 'Tabla de doble entrada'),
+        [
+          t('Histogram', 'Histograma'),
+          t('Pie chart of categories', 'Gráfica circular de categorías'),
+          t('Scatterplot', 'Diagrama de dispersión'),
+          t('Two-way table', 'Tabla de doble entrada'),
+        ],
+        t(
+          'Histograms (or stemplots) show shape, center, and spread of one quantitative variable.',
+          'Los histogramas (o diagramas de tallo) muestran forma, centro y dispersión de una variable cuantitativa.',
+        ),
       ],
-      t('Histogram', 'Histograma'),
-      'graphs',
-      t(
-        'Histograms (or stemplots) show shape, center, and spread of one quantitative variable.',
-        'Los histogramas (o diagramas de tallo) muestran forma, centro y dispersión de una variable cuantitativa.',
-      ),
-    );
+      [
+        t(
+          'You have favorite hymn (categorical) counts for a class. Which display fits best?',
+          'Tienes conteos de himno favorito (categórico) de una clase. ¿Qué gráfica encaja mejor?',
+        ),
+        t('Bar chart (or pie chart)', 'Gráfica de barras (o circular)'),
+        [
+          t('Bar chart (or pie chart)', 'Gráfica de barras (o circular)'),
+          t('Histogram of continuous bins', 'Histograma de intervalos continuos'),
+          t('Scatterplot of two numbers', 'Diagrama de dispersión de dos números'),
+          t('Boxplot of a quantitative variable', 'Diagrama de caja de una variable cuantitativa'),
+        ],
+        t(
+          'Categorical counts use bar or pie charts; histograms need quantitative bins.',
+          'Los conteos categóricos usan barras o circular; los histogramas necesitan intervalos cuantitativos.',
+        ),
+      ],
+      [
+        t(
+          'You want to compare two quantitative variables for a possible linear relationship. Best display?',
+          'Quieres comparar dos variables cuantitativas por una posible relación lineal. ¿Mejor gráfica?',
+        ),
+        t('Scatterplot', 'Diagrama de dispersión'),
+        [
+          t('Scatterplot', 'Diagrama de dispersión'),
+          t('Pie chart', 'Gráfica circular'),
+          t('Single histogram', 'Un solo histograma'),
+          t('Frequency table of one variable', 'Tabla de frecuencias de una variable'),
+        ],
+        t(
+          'Scatterplots show association between two quantitative variables.',
+          'Los diagramas de dispersión muestran la asociación entre dos variables cuantitativas.',
+        ),
+      ],
+    ] as const;
+    const [prompt, answer, choices, hint] = choice(items);
+    return mc(prompt, [...choices], answer, 'graphs', hint);
   }
 
   if (ask === 'shape') {
@@ -1354,13 +1391,46 @@ const GENERATORS: Record<TopicId, () => Question> = {
   regression: genRegression,
 };
 
-export function generateQuestion(topic: TopicId, flash = false, locale: Locale = 'en'): Question {
-  loc = locale;
+const RECENT_KEEP = 48;
+const recentFingerprints: string[] = [];
+
+function fingerprint(q: Question): string {
+  return `${q.topic}::${q.type}::${q.prompt}::${String(q.answer)}`;
+}
+
+function rememberFingerprint(fp: string): void {
+  recentFingerprints.unshift(fp);
+  if (recentFingerprints.length > RECENT_KEEP) recentFingerprints.length = RECENT_KEEP;
+}
+
+function craftOnce(topic: TopicId, flash: boolean): Question {
   if (flash) {
     const q = genFlash(topic);
     if (q) return q;
   }
-  return GENERATORS[topic]();
+  return GENERATORS[topic]!();
+}
+
+/** Fresh question for a topic; skips recent prompts and the previous item when possible. */
+export function generateQuestion(
+  topic: TopicId,
+  flash = false,
+  locale: Locale = 'en',
+  previous: Question | null = null,
+): Question {
+  loc = locale;
+  const avoid = previous ? fingerprint(previous) : '';
+  for (let attempt = 0; attempt < 16; attempt++) {
+    const q = craftOnce(topic, flash);
+    const fp = fingerprint(q);
+    if (avoid && fp === avoid) continue;
+    if (recentFingerprints.includes(fp) && attempt < 15) continue;
+    rememberFingerprint(fp);
+    return q;
+  }
+  const q = craftOnce(topic, flash);
+  rememberFingerprint(fingerprint(q));
+  return q;
 }
 
 export function checkAnswer(q: Question, raw: string): boolean {

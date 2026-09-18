@@ -48,8 +48,11 @@ function param(name: string): string | null {
 
 function buildExamQuestions(topics: TopicId[], n: number, locale: 'en' | 'es'): Question[] {
   const qs: Question[] = [];
+  let prev: Question | null = null;
   for (let i = 0; i < n; i++) {
-    qs.push(generateQuestion(topics[i % topics.length]!, false, locale));
+    const next = generateQuestion(topics[i % topics.length]!, false, locale, prev);
+    qs.push(next);
+    prev = next;
   }
   for (let i = qs.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -146,7 +149,7 @@ export function QuizPage() {
         topic = m;
       }
       setRemixAfterFail(false);
-      setQ(generateQuestion(topic, flash, locale));
+      setQ((prev) => generateQuestion(topic, flash, locale, prev));
       resetItem(m === 'teachme');
     },
     [assessment, locale, resetItem],
@@ -160,7 +163,7 @@ export function QuizPage() {
       }
       const flash = mode === 'flashcards';
       setRemixAfterFail(false);
-      setQ(generateQuestion(q.topic, flash, locale));
+      setQ(generateQuestion(q.topic, flash, locale, q));
       resetItem(mode === 'teachme');
       if (carry) setFeedback(carry);
     },
