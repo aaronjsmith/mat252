@@ -98,10 +98,8 @@ const en = {
   canvasMidterm: 'Midterm 1 window',
   canvasMidtermRange: 'Sep 16–21 · no extensions · testing center for Part 2',
   canvasDue: 'Weeks 1–3 last day Sep 23',
-  canvasSubmitted: 'Submitted work',
   canvasOpenExam: 'Still to take',
   canvasLink: 'Open in Canvas',
-  pendingReview: 'pending review',
   examCorrect: 'Correct',
   examIncorrect: 'Incorrect',
 };
@@ -205,10 +203,8 @@ const es: typeof en = {
   canvasMidterm: 'Ventana del Midterm 1',
   canvasMidtermRange: '16–21 sep · sin prórrogas · centro de exámenes para la Parte 2',
   canvasDue: 'Último día de semanas 1–3: 23 sep',
-  canvasSubmitted: 'Trabajo entregado',
   canvasOpenExam: 'Pendiente de tomar',
   canvasLink: 'Abrir en Canvas',
-  pendingReview: 'en revisión',
   examCorrect: 'Correcto',
   examIncorrect: 'Incorrecto',
 };

@@ -80,17 +80,6 @@ export function formatMd(iso: string | null): string {
   });
 }
 
-export function scoreLabel(item: CanvasWork): string {
-  if (item.score == null && item.state === 'submitted') return 'submitted';
-  if (item.score == null) return '—';
-  const n = Number.isInteger(item.score) ? String(item.score) : item.score.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
-  return `${n}/${item.pts}`;
-}
-
-export function submittedWork(): CanvasWork[] {
-  return WORK.filter((w) => w.state !== 'unsubmitted');
-}
-
 export function openExams(): CanvasWork[] {
   return WORK.filter((w) => w.exam && w.state === 'unsubmitted');
 }

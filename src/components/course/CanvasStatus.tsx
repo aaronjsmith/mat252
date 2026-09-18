@@ -1,10 +1,9 @@
-import { CANVAS_URL, COURSE, DEADLINES, formatMd, openExams, scoreLabel, submittedWork, workHref } from '../../data/canvas';
+import { CANVAS_URL, COURSE, DEADLINES, formatMd, openExams, workHref } from '../../data/canvas';
 import { useI18n } from '../../context/LanguageContext';
 import styles from './CanvasStatus.module.css';
 
 export function CanvasStatus() {
   const { t } = useI18n();
-  const submitted = submittedWork();
   const exams = openExams();
 
   return (
@@ -34,25 +33,6 @@ export function CanvasStatus() {
           </ul>
         </div>
       )}
-      <details className={styles.details}>
-        <summary>
-          {t.canvasSubmitted} ({submitted.length})
-        </summary>
-        <ul className={styles.list}>
-          {submitted.map((item) => (
-            <li key={item.id}>
-              <a href={workHref(item.id)} target="_blank" rel="noopener noreferrer">
-                {item.name}
-              </a>
-              <span>
-                {' '}
-                · {scoreLabel(item)}
-                {item.state === 'pending_review' ? ` · ${t.pendingReview}` : ''}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </details>
       <p className={styles.footer}>
         <a href={`${CANVAS_URL}/modules`} target="_blank" rel="noopener noreferrer">
           {t.canvasLink}

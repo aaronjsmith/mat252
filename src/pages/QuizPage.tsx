@@ -149,7 +149,9 @@ export function QuizPage() {
     }
     setExam(null);
     nextQuestion(mode, bossRef.current ?? undefined);
-  }, [mode, locale, assessment, nextQuestion, examGen]);
+    // Restart only when the quiz identity changes, not when nextQuestion updates.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, locale, assessment.id, examGen]);
 
   useEffect(() => {
     if (allMastered(assessment, readProgress(assessment.id)) && !readProgress(assessment.id).final_boss_cleared) {
@@ -206,24 +208,29 @@ export function QuizPage() {
 
   function onCheck() {
     if (!q) return;
+    if (exam && !exam.done && exam.results[exam.index] != null) {
+      examAdvance(exam.results);
+      return;
+    }
     const ok = checkAnswer(q, picked);
     if (exam && !exam.done) {
-      if (exam.results[exam.index] != null) return;
       const results = exam.results.slice();
       results[exam.index] = ok;
-      if (ok) bump(q.topic, 1, 1);
-      else {
-        const p = readProgress(assessment.id);
-        writeProgress(assessment.id, {
-          ...p,
-          total_attempted: p.total_attempted + 1,
-        });
-        setTick((n) => n + 1);
+      if (ok) {
+        bump(q.topic, 1, 1);
+        examAdvance(results);
+        return;
       }
+      const p = readProgress(assessment.id);
+      writeProgress(assessment.id, {
+        ...p,
+        total_attempted: p.total_attempted + 1,
+      });
+      setTick((n) => n + 1);
       setExam({ ...exam, results });
       setFeedback({
-        ok,
-        text: ok ? t.examCorrect : t.examIncorrect,
+        ok: false,
+        text: t.examIncorrect,
       });
       return;
     }
@@ -269,15 +276,8 @@ export function QuizPage() {
       const unaided = hints === 0 && !retry ? 1 : 0;
       const credit = retry ? RETRY_CREDIT : HINT_CREDIT[Math.min(hints, 3)] ?? 0.25;
       bump(q.topic, unaided, credit);
-      setFeedback({
-        ok: true,
-        text: unaided
-          ? fmt(t.correctUnaided, {
-              n: Math.min(MASTER, topicUnaided(readProgress(assessment.id), q.topic)),
-              master: MASTER,
-            })
-          : fmt(t.correctCredit, { pct: Math.round(credit * 100) }),
-      });
+      nextQuestion(mode, boss ?? undefined);
+      return;
     } else {
       setRetry(true);
       setFeedback({
