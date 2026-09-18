@@ -46,6 +46,17 @@ function param(name: string): string | null {
   return new URLSearchParams(window.location.search).get(name);
 }
 
+/** Keep ?mode= in sync so refresh does not jump back to an old exam URL. */
+function syncModeToUrl(assessmentId: string, mode: Mode): void {
+  const url = new URL(window.location.href);
+  url.searchParams.set('a', assessmentId);
+  if (mode === 'smart') url.searchParams.delete('mode');
+  else url.searchParams.set('mode', mode);
+  const next = `${url.pathname}?${url.searchParams.toString()}`;
+  const cur = `${window.location.pathname}${window.location.search}`;
+  if (next !== cur) window.history.replaceState({}, '', next);
+}
+
 function buildExamQuestions(topics: TopicId[], n: number, locale: 'en' | 'es'): Question[] {
   const qs: Question[] = [];
   let prev: Question | null = null;
@@ -173,6 +184,10 @@ export function QuizPage() {
   useEffect(() => {
     bossRef.current = boss;
   }, [boss]);
+
+  useEffect(() => {
+    syncModeToUrl(assessment.id, mode);
+  }, [assessment.id, mode]);
 
   useEffect(() => {
     if (mode === 'exam' && assessment.exam) {

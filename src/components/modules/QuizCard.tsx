@@ -77,18 +77,12 @@ export function QuizCard({ assessment }: { assessment: Assessment }) {
         <div className={styles.fill} style={{ width: `${pct}%` }} />
       </div>
       <div className={styles.actions}>
+        <Link className={styles.primary} href={quizHref(assessment.id)}>
+          {t.openPractice}
+        </Link>
         {assessment.exam ? (
-          <Link className={styles.primary} href={quizHref(assessment.id, { mode: 'exam' })}>
+          <Link className={styles.ghost} href={quizHref(assessment.id, { mode: 'exam' })}>
             {fmt(t.takeTestN, { n: examN })}
-          </Link>
-        ) : (
-          <Link className={styles.primary} href={quizHref(assessment.id)}>
-            {t.openPractice}
-          </Link>
-        )}
-        {assessment.exam ? (
-          <Link className={styles.ghost} href={quizHref(assessment.id)}>
-            {t.openPractice}
           </Link>
         ) : null}
       </div>
