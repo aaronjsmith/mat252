@@ -14,6 +14,7 @@ export type Question = {
   setup: string;
   calc: { ti: string; casio: string; excel: string };
   unit?: string;
+  values?: number[];
 };
 
 let loc: Locale = 'en';
@@ -97,6 +98,7 @@ function mc(
   topic: TopicId,
   hint: string,
   setup = '',
+  values?: number[],
 ): Question {
   return {
     id: id(),
@@ -108,6 +110,7 @@ function mc(
     hint,
     setup,
     calc: calc(''),
+    values,
   };
 }
 
@@ -120,6 +123,7 @@ function numeric(
   setup: string,
   calcHelp: Question['calc'],
   unit = '',
+  values?: number[],
 ): Question {
   return {
     id: id(),
@@ -132,6 +136,7 @@ function numeric(
     setup,
     calc: calcHelp,
     unit,
+    values,
   };
 }
 
@@ -368,6 +373,8 @@ function genGraphs(): Question {
       t('Relative frequency = class count / n.', 'Frecuencia relativa = conteo de la clase / n.'),
       `${freq[i]} / ${n}`,
       calc(`(${freq[i]}) ÷ ${n} =`, `=${freq[i]}/${n}`),
+      '',
+      freq,
     );
   }
   return mc(
@@ -406,6 +413,8 @@ function genCenter(): Question {
       t('Mean = sum of values ÷ how many values.', 'Media = suma de los valores ÷ cuántos valores hay.'),
       t(`mean = (${terms}) / ${data.length}`, `media = (${terms}) / ${data.length}`),
       calc(`(${terms}) ÷ ${data.length} =`, `=AVERAGE(${data.join(',')})`),
+      '',
+      data,
     );
   }
   if (ask === 'median') {
@@ -421,6 +430,8 @@ function genCenter(): Question {
       ),
       t(`Sorted: ${ds(sorted)}`, `Ordenado: ${ds(sorted)}`),
       calc(''),
+      '',
+      data,
     );
   }
   if (ask === 'mode') {
@@ -434,6 +445,8 @@ function genCenter(): Question {
       t('The mode is the value that appears most often.', 'La moda es el valor que aparece con más frecuencia.'),
       t('Count frequencies; pick the most frequent value.', 'Cuenta las frecuencias; elige el valor más frecuente.'),
       calc(''),
+      '',
+      data,
     );
   }
   const lo = Math.min(...data);
@@ -446,6 +459,8 @@ function genCenter(): Question {
     t('Range = maximum − minimum.', 'Rango = máximo − mínimo.'),
     t(`range = ${hi} − ${lo}`, `rango = ${hi} − ${lo}`),
     calc(`${hi} − ${lo} =`),
+    '',
+    data,
   );
 }
 
@@ -468,6 +483,8 @@ function genSpread(): Question {
       t('IQR = Q3 − Q1.', 'RIC = Q3 − Q1.'),
       t(`Sorted ${ds(sorted)}. Q1 = ${q1}, Q3 = ${q3}.`, `Ordenado ${ds(sorted)}. Q1 = ${q1}, Q3 = ${q3}.`),
       calc(`${q3} − ${q1} =`),
+      '',
+      data,
     );
   }
   if (ask === 'range4') {
@@ -483,6 +500,8 @@ function genSpread(): Question {
       t('A rough estimate is s ≈ (max − min) / 4.', 'Una estimación aproximada es s ≈ (máx − mín) / 4.'),
       `s ≈ (${Math.max(...data)} − ${Math.min(...data)}) / 4`,
       calc(`(${Math.max(...data)} − ${Math.min(...data)}) ÷ 4 =`),
+      '',
+      data,
     );
   }
   const fence = q3 + 1.5 * iqr;
@@ -503,6 +522,7 @@ function genSpread(): Question {
       `Lower fence ${num(q1 - 1.5 * iqr)}; upper fence ${num(fence)}.`,
       `Cerca inferior ${num(q1 - 1.5 * iqr)}; cerca superior ${num(fence)}.`,
     ),
+    data,
   );
 }
 
