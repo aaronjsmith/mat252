@@ -4,6 +4,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider } from './context/LanguageContext';
 import App from './App';
 import { QuizPage } from './pages/QuizPage';
+import 'katex/dist/katex.min.css';
 import './index.css';
 
 function pathOf(): string {

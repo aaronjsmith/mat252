@@ -107,7 +107,7 @@ function glossSample(): string {
 }
 
 function withGloss(hint: string, ...glosses: string[]): string {
-  return [hint, ...glosses].filter(Boolean).join('\n');
+  return [hint, ...glosses].filter(Boolean).join('\n\n');
 }
 
 function mc(
@@ -562,9 +562,10 @@ function genZScores(): Question {
       0.05,
       withGloss(
         t(
-          'z = (x − μ) / σ. The sign tells you which side of the mean x is on.',
-          'z = (x − μ) / σ. El signo indica de qué lado de la media está x.',
+          'Use the z-score formula. The sign tells you which side of the mean x is on.',
+          'Usa la fórmula de la puntuación z. El signo indica de qué lado de la media está x.',
         ),
+        'z = (x − μ) / σ',
         glossMuSigma(),
       ),
       `z = (${x} − ${mu}) / ${sigma}`,
@@ -580,9 +581,10 @@ function genZScores(): Question {
     0.05,
     withGloss(
       t(
-        'Solve for x: x = μ + zσ (start at the mean, then move z standard deviations).',
-        'Despeja x: x = μ + zσ (parte de la media y muévete z desviaciones estándar).',
+        'Solve for x: start at the mean, then move z standard deviations.',
+        'Despeja x: parte de la media y muévete z desviaciones estándar.',
       ),
+      'x = μ + zσ',
       glossMuSigma(),
     ),
     `x = ${mu} + (${zAsk})(${sigma})`,
@@ -836,9 +838,10 @@ function genNormal(): Question {
       0.5,
       withGloss(
         t(
-          'Empirical rule: about 95% of values lie within 2 standard deviations of the mean (μ ± 2σ).',
-          'Regla empírica: cerca del 95% de los valores queda a 2 desviaciones estándar de la media (μ ± 2σ).',
+          'Empirical rule: about 95% of values lie within 2 standard deviations of the mean.',
+          'Regla empírica: cerca del 95% de los valores queda a 2 desviaciones estándar de la media.',
         ),
+        'μ ± 2σ',
         glossMuSigma(),
       ),
       t(`${lo} and ${hi} are μ ± 2σ.`, `${lo} y ${hi} son μ ± 2σ.`),
@@ -863,9 +866,10 @@ function genNormal(): Question {
     'normal',
     withGloss(
       t(
-        'Distance in σ units is the z-score: (x − μ)/σ.',
-        'La distancia en unidades de σ es la puntuación z: (x − μ)/σ.',
+        'Distance in σ units is the z-score.',
+        'La distancia en unidades de σ es la puntuación z.',
       ),
+      'z = (x − μ) / σ',
       glossMuSigma(),
     ),
   );
@@ -887,9 +891,10 @@ function genClt(): Question {
       0.05,
       withGloss(
         t(
-          'Standard error of the sample mean: SE(x̄) = σ / √n.',
-          'Error estándar de la media muestral: EE(x̄) = σ / √n.',
+          'Standard error of the sample mean.',
+          'Error estándar de la media muestral.',
         ),
+        'SE(x̄) = σ / √n',
         glossMuSigma(),
         glossSample(),
       ),
@@ -910,9 +915,10 @@ function genClt(): Question {
     0.08,
     withGloss(
       t(
-        'z = (x̄ − μ) / (σ/√n). Use the SE of x̄ in the denominator, not σ alone.',
-        'z = (x̄ − μ) / (σ/√n). Usa el EE de x̄ en el denominador, no σ sola.',
+        'Use the SE of x̄ in the denominator, not σ alone.',
+        'Usa el EE de x̄ en el denominador, no σ sola.',
       ),
+      'z = (x̄ − μ) / (σ / √n)',
       glossMuSigma(),
       glossSample(),
     ),
@@ -942,9 +948,10 @@ function genCi(): Question {
       0.05,
       withGloss(
         t(
-          'Margin of error: ME = z* · (s / √n). Here s stands in for σ when σ is unknown.',
-          'Margen de error: ME = z* · (s / √n). Aquí s hace de σ cuando σ es desconocida.',
+          'Margin of error. Here s stands in for σ when σ is unknown.',
+          'Margen de error. Aquí s hace de σ cuando σ es desconocida.',
         ),
+        'ME = z* · (s / √n)',
         glossSample(),
         glossMuSigma(),
       ),
@@ -963,9 +970,10 @@ function genCi(): Question {
     0.08,
     withGloss(
       t(
-        'Lower endpoint = x̄ − z* · (s/√n). μ is the population mean the interval estimates.',
-        'Extremo inferior = x̄ − z* · (s/√n). μ es la media poblacional que estima el intervalo.',
+        'Lower endpoint of the CI. μ is the population mean the interval estimates.',
+        'Extremo inferior del IC. μ es la media poblacional que estima el intervalo.',
       ),
+      'x̄ − z* · (s / √n)',
       glossSample(),
       glossMuSigma(),
     ),
@@ -995,9 +1003,10 @@ function genHtOne(): Question {
       0.08,
       withGloss(
         t(
-          'z = (x̄ − μ₀) / (σ/√n). μ₀ is the hypothesized mean under H₀; Hₐ is the alternative.',
-          'z = (x̄ − μ₀) / (σ/√n). μ₀ es la media hipotética bajo H₀; Hₐ es la alternativa.',
+          'μ₀ is the hypothesized mean under H₀; Hₐ is the alternative.',
+          'μ₀ es la media hipotética bajo H₀; Hₐ es la alternativa.',
         ),
+        'z = (x̄ − μ₀) / (σ / √n)',
         glossMuSigma(),
         glossSample(),
       ),

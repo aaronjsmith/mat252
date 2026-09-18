@@ -16,6 +16,7 @@ import { assessmentText, themeCopy, topicLabel } from '../i18n/catalog';
 import { fmt } from '../i18n/locale';
 import { checkAnswer, generateQuestion, type Question } from '../questions/generate';
 import { MasteryChart } from '../components/progress/MasteryChart';
+import { MathText } from '../components/quiz/MathText';
 import { ScratchPad } from '../components/quiz/ScratchPad';
 import {
   copyTextToClipboard,
@@ -649,7 +650,7 @@ export function QuizPage() {
             {boss && <span className={styles.bossFace}>{theme.emoji}</span>}
             <span className={styles.pill}>{topicLabel(q.topic, locale)}</span>
           </div>
-          <h1 className={styles.prompt}>{q.prompt}</h1>
+          <MathText as="h1" className={styles.prompt} rich text={q.prompt} />
 
           {q.type === 'mc' && q.choices && (
             <div className={styles.choices} role="group" aria-label={t.choices}>
@@ -667,7 +668,7 @@ export function QuizPage() {
                     onClick={() => setPicked(c)}
                     disabled={locked || isWrong}
                   >
-                    {c}
+                    <MathText text={c} />
                   </button>
                 );
               })}
@@ -701,12 +702,27 @@ export function QuizPage() {
                   {t.hint3}
                 </button>
               </div>
-              {show1 && <div className={styles.hintBox}>{q.hint}</div>}
-              {show2 && q.setup && <div className={styles.hintBox}>{q.setup}</div>}
+              {show1 && (
+                <div className={styles.hintBox}>
+                  <MathText rich text={q.hint} />
+                </div>
+              )}
+              {show2 && q.setup && (
+                <div className={styles.hintBox}>
+                  <MathText rich text={q.setup} />
+                </div>
+              )}
               {show3 && (q.calc.ti || q.calc.excel) && (
                 <div className={styles.hintBox}>
-                  {q.calc.ti ? `${t.calcTi}${q.calc.ti}\n` : ''}
-                  {q.calc.excel ? `${t.calcExcel}${q.calc.excel}` : ''}
+                  <MathText
+                    rich
+                    text={[
+                      q.calc.ti ? `${t.calcTi}${q.calc.ti}` : '',
+                      q.calc.excel ? `${t.calcExcel}${q.calc.excel}` : '',
+                    ]
+                      .filter(Boolean)
+                      .join('\n')}
+                  />
                 </div>
               )}
             </>
@@ -714,8 +730,10 @@ export function QuizPage() {
 
           {feedback && (
             <div className={`${styles.feedback} ${feedback.ok ? styles.ok : styles.bad}`}>
-              {feedback.text}
-              {feedback.ok && !retry && locked && q.type === 'numeric' ? fmt(t.answerSuffix, { answer: String(q.answer) }) : ''}
+              <MathText rich text={feedback.text} />
+              {feedback.ok && !retry && locked && q.type === 'numeric' ? (
+                <MathText text={fmt(t.answerSuffix, { answer: String(q.answer) })} />
+              ) : null}
             </div>
           )}
 

@@ -1,0 +1,85 @@
+.wrap {
+  white-space: normal;
+}
+
+.wrap :global(.math-doc) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+
+.wrap :global(.math-doc .katex) {
+  font-size: 1.28em;
+}
+
+.wrap :global(.math-gap) {
+  height: 0.3rem;
+}
+
+.wrap :global(.math-prose) {
+  margin: 0;
+  line-height: 1.55;
+  color: inherit;
+  word-spacing: 0.03em;
+}
+
+.wrap :global(.math-step) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.wrap :global(.math-step-label) {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent-presets);
+  letter-spacing: 0.01em;
+}
+
+.wrap :global(.math-block) {
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+  text-align: center;
+}
+
+.wrap :global(.math-block .katex-display) {
+  margin: 0.25rem 0;
+}
+
+.wrap :global(.math-block .katex) {
+  font-size: 1.45em;
+}
+
+.wrap :global(.math-inline .katex) {
+  font-size: 1.2em;
+}
+
+.wrap :global(.math-fallback) {
+  font-style: italic;
+}
+
+.wrap :global(.math-overview) {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.wrap :global(.math-overview-label) {
+  display: inline-block;
+  margin-right: 0.35rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 999px;
+  background: var(--bg-inset);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  vertical-align: middle;
+}
