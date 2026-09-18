@@ -43,30 +43,29 @@ export const TOPIC_LABEL: Record<TopicId, string> = {
   regression: 'Correlation & regression',
 };
 
-export const DESC_TOPICS: TopicId[] = [
-  'data_types',
-  'sampling',
-  'graphs',
-  'center',
-  'spread',
-  'z_scores',
-  'literacy',
-];
-export const PROB_TOPICS: TopicId[] = [
-  'prob_basic',
-  'prob_compound',
-  'discrete',
+export const WEEK1_TOPICS: TopicId[] = ['data_types', 'sampling', 'graphs', 'literacy'];
+export const WEEK2_TOPICS: TopicId[] = ['center', 'spread', 'z_scores', 'prob_basic', 'prob_compound'];
+export const WEEK3_TOPICS: TopicId[] = ['discrete'];
+export const MIDTERM1_TOPICS: TopicId[] = [...WEEK1_TOPICS, ...WEEK2_TOPICS, ...WEEK3_TOPICS];
+export const WEEK4_TOPICS: TopicId[] = ['normal', 'clt', 'ci'];
+export const WEEK5_TOPICS: TopicId[] = ['ci', 'ht_one'];
+export const WEEK6_TOPICS: TopicId[] = ['ht_two', 'chi_square', 'regression'];
+export const MIDTERM2_TOPICS: TopicId[] = ['normal', 'clt', 'ci', 'ht_one', 'ht_two', 'chi_square', 'regression'];
+export const DESC_TOPICS: TopicId[] = WEEK1_TOPICS.slice();
+export const PROB_TOPICS: TopicId[] = [...WEEK2_TOPICS, ...WEEK3_TOPICS];
+export const INFER_TOPICS: TopicId[] = MIDTERM2_TOPICS.slice();
+export const ALL_TOPICS: TopicId[] = [
+  ...WEEK1_TOPICS,
+  ...WEEK2_TOPICS,
+  ...WEEK3_TOPICS,
   'normal',
   'clt',
-];
-export const INFER_TOPICS: TopicId[] = [
   'ci',
   'ht_one',
   'ht_two',
   'chi_square',
   'regression',
 ];
-export const ALL_TOPICS: TopicId[] = [...DESC_TOPICS, ...PROB_TOPICS, ...INFER_TOPICS];
 
 export type ThemeId =
   | 'gathering'
@@ -79,7 +78,8 @@ export type ThemeId =
   | 'manna'
   | 'deseret'
   | 'alma'
-  | 'line';
+  | 'line'
+  | 'plates';
 
 export interface BossCopy {
   name: string;
@@ -311,6 +311,25 @@ export const THEMES: Record<ThemeId, BossCopy> = {
     emojiWin: '📈',
     emojiDead: '🧭',
   },
+  plates: {
+    name: 'The Plates',
+    invite: 'Every topic is mastered at 10/10. The plates are brought to the testing center — begin now?',
+    start: 'The Plates: one unaided question per topic — no hints. This is Midterm 1 shape.',
+    startPractice: 'Practice the plates: one unaided question per topic — no hints.',
+    progress: 'The Plates · {current}/{total} · {topic}',
+    ok: 'The record holds · {current}/{total}. Continue.',
+    miss: 'Missed {topic} — mastery drops to {progress}. Clear a remix to proceed.',
+    fail: 'The plates dim on {topic} — that topic drops to {progress}.',
+    win: 'The record is secure. You’re ready for Midterm 1.',
+    winPractice: 'Practice victory! Master every topic at 10/10, then face the plates again.',
+    cleared: 'The Plates cleared',
+    fightLabel: 'Face the Plates',
+    practiceLabel: 'Practice: The Plates',
+    emoji: '📜',
+    emojiHit: '🔥',
+    emojiWin: '🛡️',
+    emojiDead: '✨',
+  },
 };
 
 export interface Assessment {
@@ -327,6 +346,9 @@ export interface Assessment {
   nourish?: boolean;
   flashcards?: boolean;
   boss: boolean;
+  exam?: boolean;
+  examLength?: number;
+  featured?: boolean;
   topicIds: TopicId[];
 }
 
@@ -334,6 +356,7 @@ export interface WeekGroup {
   id: string;
   title: string;
   blurb: string;
+  current?: boolean;
 }
 
 export const WEEK_GROUPS: WeekGroup[] = [
@@ -343,19 +366,40 @@ export const WEEK_GROUPS: WeekGroup[] = [
     blurb: 'Every MAT 252 topic in one quiz — Nourish and Strengthen across the term.',
   },
   {
-    id: 'weeks12',
-    title: 'Weeks 1–2 · Data & description',
-    blurb: 'Data collection, sampling, graphs, center, spread, and z-scores.',
+    id: 'week1',
+    title: 'Week 1 · Sampling & graphs',
+    blurb: 'Data types, experimental design, sampling, and graphical summaries.',
   },
   {
-    id: 'weeks34',
-    title: 'Weeks 3–4 · Probability & models',
-    blurb: 'Probability, discrete random variables, the normal curve, and the CLT.',
+    id: 'week2',
+    title: 'Week 2 · Summaries & probability',
+    blurb: 'Center, spread, z-scores, classical and compound probability.',
   },
   {
-    id: 'weeks57',
-    title: 'Weeks 5–7 · Inference',
-    blurb: 'Confidence intervals, hypothesis tests, chi-square, correlation, and regression.',
+    id: 'week3',
+    title: 'Week 3 · Binomial & Midterm 1',
+    blurb: 'Discrete random variables and binomial models. Midterm 1 covers Weeks 1–3 (due Sep 21).',
+    current: true,
+  },
+  {
+    id: 'week4',
+    title: 'Week 4 · Normal, CLT & CI',
+    blurb: 'Normal curve, sampling distributions, and confidence intervals for means.',
+  },
+  {
+    id: 'week5',
+    title: 'Week 5 · Proportions & tests',
+    blurb: 'Confidence intervals for proportions and hypothesis tests for means.',
+  },
+  {
+    id: 'week6',
+    title: 'Week 6 · Tests & regression',
+    blurb: 'Hypothesis tests for proportions, chi-square, correlation, and regression.',
+  },
+  {
+    id: 'week7',
+    title: 'Week 7 · Midterm 2',
+    blurb: 'Review and Midterm 2 (Weeks 4–6), available Oct 12–16.',
   },
 ];
 
@@ -374,67 +418,86 @@ export const ASSESSMENTS: Assessment[] = [
     nourish: true,
     flashcards: true,
     boss: true,
+    exam: true,
+    examLength: 20,
     topicIds: ALL_TOPICS.slice(),
   },
   {
-    id: 'assessment1',
-    weekId: 'weeks12',
+    id: 'week1',
+    weekId: 'week1',
     number: 1,
-    title: 'Assessment 1',
-    summary: 'Data, graphs, and descriptive statistics — Weeks 1–2 with the False Weights boss fight.',
-    badge: 'Weeks 1–2 · Zarahemla',
-    theme: 'zarahemla',
+    title: 'Week 1 Quiz',
+    summary: 'Sampling, data types, experimental design, and graphs — testing portion matches the Canvas week quiz.',
+    badge: 'Week 1 · Meetinghouse',
+    theme: 'meetinghouse',
     available: true,
     flashcards: true,
     boss: true,
-    topicIds: DESC_TOPICS.slice(),
+    exam: true,
+    examLength: 10,
+    topicIds: WEEK1_TOPICS.slice(),
   },
   {
     id: 'lesson_data',
-    weekId: 'weeks12',
+    weekId: 'week1',
     number: 11,
     title: 'Data & sampling',
-    summary: 'Types of data, measurement levels, sampling methods, and bias.',
-    badge: 'Week 1 · Meetinghouse',
-    theme: 'meetinghouse',
+    summary: 'Types of data, measurement levels, sampling methods, bias, and experiments.',
+    badge: 'Ch 1 · Institute',
+    theme: 'institute',
     available: true,
     flashcards: false,
     boss: true,
     topicIds: ['data_types', 'sampling'],
   },
   {
-    id: 'lesson_desc',
-    weekId: 'weeks12',
+    id: 'lesson_graphs',
+    weekId: 'week1',
     number: 12,
-    title: 'Descriptive statistics',
-    summary: 'Frequency tables, graphs, center, and spread.',
-    badge: 'Week 2 · Institute',
+    title: 'Graphical summaries',
+    summary: 'Frequency tables, histograms, and statistical literacy (bad graphs, confounding).',
+    badge: 'Ch 2 · Institute',
     theme: 'institute',
     available: true,
     flashcards: false,
     boss: true,
-    topicIds: ['graphs', 'center', 'spread'],
+    topicIds: ['graphs', 'literacy'],
   },
   {
-    id: 'assessment2',
-    weekId: 'weeks34',
+    id: 'week2',
+    weekId: 'week2',
     number: 2,
-    title: 'Assessment 2',
-    summary: 'Probability and distribution models — Weeks 3–4 with The Tempest boss fight.',
-    badge: 'Weeks 3–4 · Bountiful',
-    theme: 'bountiful',
+    title: 'Week 2 Quiz',
+    summary: 'Numerical summaries and probability — testing portion matches the Canvas week quiz.',
+    badge: 'Week 2 · Casting Lots',
+    theme: 'lots',
     available: true,
     flashcards: true,
     boss: true,
-    topicIds: PROB_TOPICS.slice(),
+    exam: true,
+    examLength: 10,
+    topicIds: WEEK2_TOPICS.slice(),
+  },
+  {
+    id: 'lesson_desc',
+    weekId: 'week2',
+    number: 21,
+    title: 'Numerical summaries',
+    summary: 'Mean, median, mode, spread, five-number summary, and z-scores.',
+    badge: 'Ch 3 · Daily Manna',
+    theme: 'manna',
+    available: true,
+    flashcards: false,
+    boss: true,
+    topicIds: ['center', 'spread', 'z_scores'],
   },
   {
     id: 'lesson_prob',
-    weekId: 'weeks34',
-    number: 3,
+    weekId: 'week2',
+    number: 22,
     title: 'Probability',
     summary: 'Classical probability, complements, and compound events.',
-    badge: 'Week 3 · Casting Lots',
+    badge: 'Ch 4 · Casting Lots',
     theme: 'lots',
     available: true,
     flashcards: false,
@@ -442,38 +505,72 @@ export const ASSESSMENTS: Assessment[] = [
     topicIds: ['prob_basic', 'prob_compound'],
   },
   {
-    id: 'lesson_dist',
-    weekId: 'weeks34',
+    id: 'midterm1',
+    weekId: 'week3',
+    number: 31,
+    title: 'Midterm 1',
+    summary:
+      'Weeks 1–3: data, graphs, summaries, probability, and binomial. No hints. 20 questions in testing-center shape (ALEKS + written). Due Sep 21.',
+    badge: 'Exam · The Plates',
+    theme: 'plates',
+    available: true,
+    flashcards: true,
+    boss: true,
+    exam: true,
+    examLength: 20,
+    featured: true,
+    topicIds: MIDTERM1_TOPICS.slice(),
+  },
+  {
+    id: 'lesson_discrete',
+    weekId: 'week3',
+    number: 32,
+    title: 'Discrete & binomial',
+    summary: 'Discrete RVs, expected value, and binomial probability — Excel BINOM.DIST.',
+    badge: 'Ch 5 · The Tempest',
+    theme: 'bountiful',
+    available: true,
+    flashcards: false,
+    boss: true,
+    exam: true,
+    examLength: 10,
+    topicIds: WEEK3_TOPICS.slice(),
+  },
+  {
+    id: 'week4',
+    weekId: 'week4',
     number: 4,
-    title: 'Distributions & CLT',
-    summary: 'Binomial, normal, z-scores, and sampling distributions.',
-    badge: 'Week 4 · Daily Manna',
+    title: 'Week 4 Quiz',
+    summary: 'Normal model, CLT, and confidence intervals for means.',
+    badge: 'Week 4 · Urim',
+    theme: 'urim',
+    available: true,
+    flashcards: true,
+    boss: true,
+    exam: true,
+    examLength: 10,
+    topicIds: WEEK4_TOPICS.slice(),
+  },
+  {
+    id: 'lesson_dist',
+    weekId: 'week4',
+    number: 41,
+    title: 'Normal & CLT',
+    summary: 'Empirical rule, z-scores on the normal curve, and sampling distributions.',
+    badge: 'Ch 6 · Daily Manna',
     theme: 'manna',
     available: true,
     flashcards: false,
     boss: true,
-    topicIds: ['discrete', 'normal', 'clt'],
-  },
-  {
-    id: 'assessment3',
-    weekId: 'weeks57',
-    number: 3,
-    title: 'Assessment 3',
-    summary: 'Inference: intervals, tests, chi-square, and regression — Weeks 5–7.',
-    badge: 'Weeks 5–7 · Deseret',
-    theme: 'deseret',
-    available: true,
-    flashcards: true,
-    boss: true,
-    topicIds: INFER_TOPICS.slice(),
+    topicIds: ['normal', 'clt'],
   },
   {
     id: 'lesson_ci',
-    weekId: 'weeks57',
-    number: 5,
-    title: 'Confidence intervals',
-    summary: 'Point estimates and confidence intervals for means and proportions.',
-    badge: 'Week 5 · Urim',
+    weekId: 'week4',
+    number: 42,
+    title: 'CI for means',
+    summary: 'Point estimates and confidence intervals for a population mean.',
+    badge: 'Ch 7.1–7.2 · Urim',
     theme: 'urim',
     available: true,
     flashcards: false,
@@ -481,30 +578,76 @@ export const ASSESSMENTS: Assessment[] = [
     topicIds: ['ci'],
   },
   {
+    id: 'week5',
+    weekId: 'week5',
+    number: 5,
+    title: 'Week 5 Quiz',
+    summary: 'Confidence intervals for proportions and hypothesis tests for means.',
+    badge: 'Week 5 · Alma 32',
+    theme: 'alma',
+    available: true,
+    flashcards: true,
+    boss: true,
+    exam: true,
+    examLength: 10,
+    topicIds: WEEK5_TOPICS.slice(),
+  },
+  {
     id: 'lesson_ht',
-    weekId: 'weeks57',
-    number: 6,
+    weekId: 'week5',
+    number: 51,
     title: 'Hypothesis tests',
-    summary: 'One- and two-sample tests — experiment on the word (Alma 32).',
-    badge: 'Week 6 · Alma 32',
+    summary: 'One-sample tests for a mean — experiment on the word (Alma 32).',
+    badge: 'Ch 8.1–8.3 · Alma 32',
     theme: 'alma',
     available: true,
     flashcards: false,
     boss: true,
-    topicIds: ['ht_one', 'ht_two'],
+    topicIds: ['ht_one'],
+  },
+  {
+    id: 'week6',
+    weekId: 'week6',
+    number: 6,
+    title: 'Week 6 Quiz',
+    summary: 'Tests for proportions, chi-square, correlation, and regression.',
+    badge: 'Week 6 · Line upon Line',
+    theme: 'line',
+    available: true,
+    flashcards: true,
+    boss: true,
+    exam: true,
+    examLength: 10,
+    topicIds: WEEK6_TOPICS.slice(),
   },
   {
     id: 'lesson_rel',
-    weekId: 'weeks57',
-    number: 7,
+    weekId: 'week6',
+    number: 61,
     title: 'Chi-square & regression',
     summary: 'Independence, correlation, slope, and r² — line upon line.',
-    badge: 'Week 7 · Line upon Line',
+    badge: 'Ch 11 · Line upon Line',
     theme: 'line',
     available: true,
     flashcards: false,
     boss: true,
     topicIds: ['chi_square', 'regression'],
+  },
+  {
+    id: 'midterm2',
+    weekId: 'week7',
+    number: 7,
+    title: 'Midterm 2',
+    summary: 'Weeks 4–6: normal, CLT, intervals, tests, and regression. 20-question testing portion.',
+    badge: 'Exam · Deseret',
+    theme: 'deseret',
+    available: true,
+    flashcards: true,
+    boss: true,
+    exam: true,
+    examLength: 20,
+    featured: true,
+    topicIds: MIDTERM2_TOPICS.slice(),
   },
 ];
 
@@ -519,7 +662,11 @@ export function quizHref(id: string, extra?: Record<string, string>): string {
 }
 
 export function weekAssessmentForTopic(topicId: TopicId): Assessment | undefined {
-  return ASSESSMENTS.find((a) => !a.compose && a.topicIds.includes(topicId));
+  return ASSESSMENTS.find((a) => !a.compose && !a.featured && a.topicIds.includes(topicId));
+}
+
+export function examLengthOf(assessment: Assessment): number {
+  return assessment.examLength ?? Math.max(8, assessment.topicIds.length);
 }
 
 /** Unique topics in a week group, in course catalog order. */
@@ -637,13 +784,24 @@ export const FLASHCARDS: { topic: TopicId; front: string; back: string; choices:
   },
   {
     topic: 'discrete',
-    front: 'Binomial probability',
-    back: 'P(X = k) = C(n, k) pᵏ (1 − p)ⁿ⁻ᵏ',
+    front: 'Binomial mean and variance',
+    back: 'E(X) = np,  Var(X) = np(1 − p)',
     choices: [
-      'P(X = k) = C(n, k) pᵏ (1 − p)ⁿ⁻ᵏ',
-      'P(X = k) = n p k',
-      'P(X = k) = pᵏ / n',
-      'P(X = k) = C(n, k) / p',
+      'E(X) = np,  Var(X) = np(1 − p)',
+      'E(X) = n + p,  Var(X) = n − p',
+      'E(X) = pⁿ,  Var(X) = √n',
+      'E(X) = n/p,  Var(X) = p(1 − p)',
+    ],
+  },
+  {
+    topic: 'discrete',
+    front: 'Excel binomial P(X = k)',
+    back: 'BINOM.DIST(k, n, p, FALSE)',
+    choices: [
+      'BINOM.DIST(k, n, p, FALSE)',
+      'BINOM.DIST(k, n, p, TRUE)',
+      'NORM.DIST(k, n, p, FALSE)',
+      'AVERAGE(k, n, p)',
     ],
   },
   {

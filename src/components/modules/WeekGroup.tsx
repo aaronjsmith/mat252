@@ -33,7 +33,7 @@ export function WeekGroup({
   const isOverview = week.id === 'overview';
   const weekMastery = readWeekMasteryView(week.id);
   const [collapsed, setCollapsed] = useState(() =>
-    isOverview ? false : Boolean(readCollapsed()[week.id]),
+    isOverview || week.current ? false : Boolean(readCollapsed()[week.id]),
   );
 
   const toggle = () => {

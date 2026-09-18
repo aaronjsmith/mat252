@@ -303,6 +303,40 @@ function genSampling(): Question {
         'Una MAS da a cada muestra de tamaño n la misma probabilidad.',
       ),
     ],
+    [
+      t(
+        'Researchers randomly assign institute students to a new study app or the usual notes, then compare quiz scores.',
+        'Los investigadores asignan al azar a estudiantes del instituto a una nueva app de estudio o a las notas usuales y comparan las calificaciones.',
+      ),
+      t('Statistical experiment', 'Experimento estadístico'),
+      [
+        t('Statistical experiment', 'Experimento estadístico'),
+        t('Observational study', 'Estudio observacional'),
+        t('Census of a population', 'Censo de una población'),
+        t('Convenience sample only', 'Solo muestra por conveniencia'),
+      ],
+      t(
+        'A treatment is imposed (the app vs usual notes) — that is an experiment.',
+        'Se impone un tratamiento (la app vs las notas usuales) — eso es un experimento.',
+      ),
+    ],
+    [
+      t(
+        'A poll asks students how many hours they sleep and records their GPA. No treatment is assigned.',
+        'Una encuesta pregunta a estudiantes cuántas horas duermen y anota su GPA. No se asigna ningún tratamiento.',
+      ),
+      t('Observational study', 'Estudio observacional'),
+      [
+        t('Observational study', 'Estudio observacional'),
+        t('Statistical experiment', 'Experimento estadístico'),
+        t('Simple random sample of treatments', 'Muestra aleatoria simple de tratamientos'),
+        t('Matched-pairs experiment', 'Experimento de pares emparejados'),
+      ],
+      t(
+        'Values are recorded as they are — no treatment is imposed.',
+        'Se registran los valores tal como son — no se impone un tratamiento.',
+      ),
+    ],
   ] as const;
   const [prompt, answer, choices, hint] = choice(items);
   return mc(
@@ -652,11 +686,11 @@ function genProbCompound(): Question {
 }
 
 function genDiscrete(): Question {
-  const n = randInt(4, 7);
-  const p = choice([0.2, 0.25, 0.5]);
-  const k = randInt(0, 3);
+  const n = randInt(4, 8);
+  const p = choice([0.2, 0.25, 0.4, 0.5]);
+  const k = randInt(0, Math.min(3, n));
   const pk = nCk(n, k) * p ** k * (1 - p) ** (n - k);
-  const ask = choice(['binom', 'expect']);
+  const ask = choice(['binom', 'expect', 'var', 'atleast', 'unusual']);
   if (ask === 'binom') {
     return numeric(
       t(
@@ -666,7 +700,7 @@ function genDiscrete(): Question {
       num(pk, 4),
       'discrete',
       0.002,
-      'P(X = k) = C(n,k) p^k (1−p)^{n−k}.',
+      'P(X = k) = C(n,k) p^k (1−p)^{n−k}. Excel: BINOM.DIST(k, n, p, FALSE).',
       t(
         `C(${n},${k}) = ${nCk(n, k)}; then multiply by ${p}^${k} (1−${p})^${n - k}.`,
         `C(${n},${k}) = ${nCk(n, k)}; luego multiplica por ${p}^${k} (1−${p})^${n - k}.`,
@@ -674,15 +708,66 @@ function genDiscrete(): Question {
       calc(`nCr(${n},${k}) × ${p}^${k} × ${(1 - p)}^${n - k} =`, `=BINOM.DIST(${k},${n},${p},FALSE)`),
     );
   }
-  const mu = n * p;
-  return numeric(
-    t(`X ~ Binomial(n = ${n}, p = ${p}). Find E(X).`, `X ~ Binomial(n = ${n}, p = ${p}). Halla E(X).`),
-    mu,
+  if (ask === 'expect') {
+    const mu = n * p;
+    return numeric(
+      t(`X ~ Binomial(n = ${n}, p = ${p}). Find E(X).`, `X ~ Binomial(n = ${n}, p = ${p}). Halla E(X).`),
+      mu,
+      'discrete',
+      0.01,
+      t('For a binomial, E(X) = np.', 'Para una binomial, E(X) = np.'),
+      `E(X) = ${n} × ${p}`,
+      calc(`${n} × ${p} =`),
+    );
+  }
+  if (ask === 'var') {
+    const v = n * p * (1 - p);
+    return numeric(
+      t(
+        `X ~ Binomial(n = ${n}, p = ${p}). Find Var(X).`,
+        `X ~ Binomial(n = ${n}, p = ${p}). Halla Var(X).`,
+      ),
+      v,
+      'discrete',
+      0.02,
+      t('For a binomial, Var(X) = np(1 − p).', 'Para una binomial, Var(X) = np(1 − p).'),
+      `Var(X) = ${n} × ${p} × ${1 - p}`,
+      calc(`${n} × ${p} × ${1 - p} =`),
+    );
+  }
+  if (ask === 'atleast') {
+    const p0 = (1 - p) ** n;
+    const ans = num(1 - p0, 4);
+    return numeric(
+      t(
+        `X ~ Binomial(n = ${n}, p = ${p}). Find P(X ≥ 1). Round to 4 decimals.`,
+        `X ~ Binomial(n = ${n}, p = ${p}). Halla P(X ≥ 1). Redondea a 4 decimales.`,
+      ),
+      ans,
+      'discrete',
+      0.002,
+      t(
+        'P(X ≥ 1) = 1 − P(X = 0) = 1 − (1 − p)^n.',
+        'P(X ≥ 1) = 1 − P(X = 0) = 1 − (1 − p)^n.',
+      ),
+      `1 − (${1 - p})^${n}`,
+      calc(`1 − ${1 - p}^${n} =`, `=1-BINOM.DIST(0,${n},${p},FALSE)`),
+    );
+  }
+  const pEvent = num(pk, 4);
+  const unusual = pEvent < 0.05;
+  return mc(
+    t(
+      `A binomial probability is P(X = ${k}) = ${pEvent} (n = ${n}, p = ${p}). Using the 0.05 guideline, is this outcome unusual?`,
+      `Una probabilidad binomial es P(X = ${k}) = ${pEvent} (n = ${n}, p = ${p}). Usando la pauta de 0.05, ¿es inusual este resultado?`,
+    ),
+    [t('Yes, unusual', 'Sí, inusual'), t('No, not unusual', 'No, no es inusual')],
+    unusual ? t('Yes, unusual', 'Sí, inusual') : t('No, not unusual', 'No, no es inusual'),
     'discrete',
-    0.01,
-    t('For a binomial, E(X) = np.', 'Para una binomial, E(X) = np.'),
-    `E(X) = ${n} × ${p}`,
-    calc(`${n} × ${p} =`),
+    t(
+      'A common rule: an event with probability less than 0.05 is unusual.',
+      'Una regla común: un evento con probabilidad menor que 0.05 es inusual.',
+    ),
   );
 }
 

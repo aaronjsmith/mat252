@@ -2,7 +2,9 @@
 
 Unofficial student practice for Ensign College **MAT 252 Statistics**, built on the same React + Vite + Cloudflare Workers UI framework as [dashboard.ensign.quest](https://dashboard.ensign.quest/) (ENG 301 Student Outcomes Dashboard). Quiz behavior follows [mat107.ensign.quest](https://mat107.ensign.quest/): mastery at **10 unaided correct** per topic, hint penalties, and themed boss fights.
 
-Canvas source: [course 27287 modules](https://ensign.instructure.com/courses/27287/modules). Downloaded module text lives in `content/` when a logged-in session is available.
+Weeks follow Canvas course 27287. Weekly quizzes and both midterms have a **no-hints testing portion**. Midterm 1 covers Weeks 1–3 (due Sep 21).
+
+Canvas source: [course 27287 modules](https://ensign.instructure.com/courses/27287/modules). A signed-in dump of modules lives in `course-content/` (gitignored). Assignment snapshot used by the home page is in `src/data/canvas.ts`.
 
 ## Local development
 

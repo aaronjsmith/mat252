@@ -11,6 +11,11 @@
   box-shadow: var(--shadow-card);
 }
 
+.featured {
+  border-top-color: var(--accent-highlights);
+  box-shadow: var(--shadow-pop);
+}
+
 .compact {
   padding: 10px 14px;
 }

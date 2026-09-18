@@ -11,12 +11,20 @@ export interface TopicProgress {
   unaided_correct: number;
 }
 
+export interface ExamRecord {
+  correct: number;
+  total: number;
+  at: number;
+}
+
 export interface ProgressState {
   version: 1;
   topics: Partial<Record<TopicId, TopicProgress>>;
   total_attempted: number;
   total_credit: number;
   final_boss_cleared: boolean;
+  exam_last?: ExamRecord;
+  exam_best?: ExamRecord;
 }
 
 function empty(): ProgressState {
@@ -193,6 +201,8 @@ export interface ProgressSummary {
   attempted: number;
   accuracy: number | null;
   bossCleared: boolean;
+  examLast: ExamRecord | null;
+  examBest: ExamRecord | null;
 }
 
 export function readProgressSummary(assessment: Assessment): ProgressSummary {
@@ -203,6 +213,8 @@ export function readProgressSummary(assessment: Assessment): ProgressSummary {
     attempted: 0,
     accuracy: null,
     bossCleared: false,
+    examLast: null,
+    examBest: null,
   };
   try {
     const p = readProgress(assessment.id);
@@ -218,6 +230,8 @@ export function readProgressSummary(assessment: Assessment): ProgressSummary {
       attempted,
       accuracy: attempted ? Math.round((credit / attempted) * 100) : null,
       bossCleared: Boolean(p.final_boss_cleared),
+      examLast: p.exam_last ?? null,
+      examBest: p.exam_best ?? null,
     };
   } catch {
     return emptySum;
@@ -243,4 +257,18 @@ export function syncTopicToRelated(
     const p = setTopicUnaided(readProgress(id), topicId, unaided);
     writeProgress(id, p);
   }
+}
+
+export function recordExamScore(assessmentId: string, correct: number, total: number): ProgressState {
+  const p = readProgress(assessmentId);
+  const rec: ExamRecord = { correct, total, at: Date.now() };
+  const best =
+    p.exam_best && p.exam_best.total
+      ? p.exam_best.correct / p.exam_best.total >= correct / total
+        ? p.exam_best
+        : rec
+      : rec;
+  const next = { ...p, exam_last: rec, exam_best: best };
+  writeProgress(assessmentId, next);
+  return next;
 }

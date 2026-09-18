@@ -27,17 +27,33 @@ const WEEK_ES: Record<string, { title: string; blurb: string }> = {
     title: 'Curso completo',
     blurb: 'Todos los temas de MAT 252 en un cuestionario — Nutrir y fortalecer a lo largo del término.',
   },
-  weeks12: {
-    title: 'Semanas 1–2 · Datos y descripción',
-    blurb: 'Recolección de datos, muestreo, gráficas, centro, dispersión y puntuaciones z.',
+  week1: {
+    title: 'Semana 1 · Muestreo y gráficas',
+    blurb: 'Tipos de datos, diseño experimental, muestreo y resúmenes gráficos.',
   },
-  weeks34: {
-    title: 'Semanas 3–4 · Probabilidad y modelos',
-    blurb: 'Probabilidad, variables aleatorias discretas, la curva normal y el TLC.',
+  week2: {
+    title: 'Semana 2 · Resúmenes y probabilidad',
+    blurb: 'Centro, dispersión, puntuaciones z, probabilidad clásica y compuesta.',
   },
-  weeks57: {
-    title: 'Semanas 5–7 · Inferencia',
-    blurb: 'Intervalos de confianza, pruebas de hipótesis, chi-cuadrado, correlación y regresión.',
+  week3: {
+    title: 'Semana 3 · Binomial y Midterm 1',
+    blurb: 'Variables aleatorias discretas y modelos binomiales. El Midterm 1 cubre las semanas 1–3 (vence el 21 de sep).',
+  },
+  week4: {
+    title: 'Semana 4 · Normal, TLC e IC',
+    blurb: 'Curva normal, distribuciones muestrales e intervalos de confianza para medias.',
+  },
+  week5: {
+    title: 'Semana 5 · Proporciones y pruebas',
+    blurb: 'Intervalos de confianza para proporciones y pruebas de hipótesis para medias.',
+  },
+  week6: {
+    title: 'Semana 6 · Pruebas y regresión',
+    blurb: 'Pruebas para proporciones, chi-cuadrado, correlación y regresión.',
+  },
+  week7: {
+    title: 'Semana 7 · Midterm 2',
+    blurb: 'Repaso y Midterm 2 (semanas 4–6), disponible del 12 al 16 de oct.',
   },
 };
 
@@ -47,55 +63,86 @@ const ASSESSMENT_ES: Record<string, { title: string; summary: string; badge: str
     summary: 'Todos los temas de estadística de MAT 252 con pistas y la pelea contra La Dispersión.',
     badge: 'Reunión · La Dispersión',
   },
-  assessment1: {
-    title: 'Evaluación 1',
-    summary: 'Datos, gráficas y estadística descriptiva — Semanas 1–2 con la pelea contra Pesas falsas.',
-    badge: 'Semanas 1–2 · Zarahemla',
+  week1: {
+    title: 'Cuestionario de la semana 1',
+    summary: 'Muestreo, tipos de datos, diseño experimental y gráficas — la prueba sigue el quiz de Canvas.',
+    badge: 'Semana 1 · Casa de reuniones',
   },
   lesson_data: {
     title: 'Datos y muestreo',
-    summary: 'Tipos de datos, niveles de medición, métodos de muestreo y sesgo.',
-    badge: 'Semana 1 · Casa de reuniones',
+    summary: 'Tipos de datos, niveles de medición, métodos de muestreo, sesgo y experimentos.',
+    badge: 'Cap. 1 · Instituto',
+  },
+  lesson_graphs: {
+    title: 'Resúmenes gráficos',
+    summary: 'Tablas de frecuencia, histogramas y alfabetización estadística (gráficas malas, confusión).',
+    badge: 'Cap. 2 · Instituto',
+  },
+  week2: {
+    title: 'Cuestionario de la semana 2',
+    summary: 'Resúmenes numéricos y probabilidad — la prueba sigue el quiz de Canvas.',
+    badge: 'Semana 2 · Echar suertes',
   },
   lesson_desc: {
-    title: 'Estadística descriptiva',
-    summary: 'Tablas de frecuencia, gráficas, centro y dispersión.',
-    badge: 'Semana 2 · Instituto',
-  },
-  assessment2: {
-    title: 'Evaluación 2',
-    summary: 'Probabilidad y modelos de distribución — Semanas 3–4 con la pelea contra La Tempestad.',
-    badge: 'Semanas 3–4 · Abundancia',
+    title: 'Resúmenes numéricos',
+    summary: 'Media, mediana, moda, dispersión, resumen de cinco números y puntuaciones z.',
+    badge: 'Cap. 3 · Maná diario',
   },
   lesson_prob: {
     title: 'Probabilidad',
     summary: 'Probabilidad clásica, complementos y eventos compuestos.',
-    badge: 'Semana 3 · Echar suertes',
+    badge: 'Cap. 4 · Echar suertes',
+  },
+  midterm1: {
+    title: 'Midterm 1',
+    summary:
+      'Semanas 1–3: datos, gráficas, resúmenes, probabilidad y binomial. Sin pistas. 20 preguntas al estilo del centro de exámenes. Vence el 21 de sep.',
+    badge: 'Examen · Las planchas',
+  },
+  lesson_discrete: {
+    title: 'Discretas y binomial',
+    summary: 'VA discretas, valor esperado y probabilidad binomial — Excel BINOM.DIST.',
+    badge: 'Cap. 5 · La Tempestad',
+  },
+  week4: {
+    title: 'Cuestionario de la semana 4',
+    summary: 'Modelo normal, TLC e intervalos de confianza para medias.',
+    badge: 'Semana 4 · Urim',
   },
   lesson_dist: {
-    title: 'Distribuciones y TLC',
-    summary: 'Binomial, normal, puntuaciones z y distribuciones muestrales.',
-    badge: 'Semana 4 · Maná diario',
-  },
-  assessment3: {
-    title: 'Evaluación 3',
-    summary: 'Inferencia: intervalos, pruebas, chi-cuadrado y regresión — Semanas 5–7.',
-    badge: 'Semanas 5–7 · Deseret',
+    title: 'Normal y TLC',
+    summary: 'Regla empírica, puntuaciones z en la curva normal y distribuciones muestrales.',
+    badge: 'Cap. 6 · Maná diario',
   },
   lesson_ci: {
-    title: 'Intervalos de confianza',
-    summary: 'Estimaciones puntuales e intervalos de confianza para medias y proporciones.',
-    badge: 'Semana 5 · Urim',
+    title: 'IC para medias',
+    summary: 'Estimaciones puntuales e intervalos de confianza para una media poblacional.',
+    badge: 'Cap. 7.1–7.2 · Urim',
+  },
+  week5: {
+    title: 'Cuestionario de la semana 5',
+    summary: 'Intervalos de confianza para proporciones y pruebas de hipótesis para medias.',
+    badge: 'Semana 5 · Alma 32',
   },
   lesson_ht: {
     title: 'Pruebas de hipótesis',
-    summary: 'Pruebas de una y dos muestras — experimentar con la palabra (Alma 32).',
-    badge: 'Semana 6 · Alma 32',
+    summary: 'Pruebas de una muestra para una media — experimentar con la palabra (Alma 32).',
+    badge: 'Cap. 8.1–8.3 · Alma 32',
+  },
+  week6: {
+    title: 'Cuestionario de la semana 6',
+    summary: 'Pruebas para proporciones, chi-cuadrado, correlación y regresión.',
+    badge: 'Semana 6 · Línea por línea',
   },
   lesson_rel: {
     title: 'Chi-cuadrado y regresión',
     summary: 'Independencia, correlación, pendiente y r² — línea por línea.',
-    badge: 'Semana 7 · Línea por línea',
+    badge: 'Cap. 11 · Línea por línea',
+  },
+  midterm2: {
+    title: 'Midterm 2',
+    summary: 'Semanas 4–6: normal, TLC, intervalos, pruebas y regresión. Prueba de 20 preguntas.',
+    badge: 'Examen · Deseret',
   },
 };
 
@@ -309,6 +356,25 @@ const THEMES_ES: Record<ThemeId, BossCopy> = {
     emojiWin: '📈',
     emojiDead: '🧭',
   },
+  plates: {
+    name: 'Las planchas',
+    invite: 'Cada tema está dominado 10/10. Las planchas van al centro de exámenes — ¿empezar ahora?',
+    start: 'Las planchas: una pregunta sin ayuda por tema — sin pistas. Forma del Midterm 1.',
+    startPractice: 'Practica las planchas: una pregunta sin ayuda por tema — sin pistas.',
+    progress: 'Las planchas · {current}/{total} · {topic}',
+    ok: 'El registro se sostiene · {current}/{total}. Continúa.',
+    miss: 'Fallaste {topic} — el dominio baja a {progress}. Completa otra para continuar.',
+    fail: 'Las planchas se apagan en {topic} — ese tema baja a {progress}.',
+    win: 'El registro está seguro. Estás listo para el Midterm 1.',
+    winPractice: '¡Victoria de práctica! Domina cada tema 10/10 y luego enfrenta de nuevo las planchas.',
+    cleared: 'Las planchas superadas',
+    fightLabel: 'Enfrentar las planchas',
+    practiceLabel: 'Práctica: Las planchas',
+    emoji: '📜',
+    emojiHit: '🔥',
+    emojiWin: '🛡️',
+    emojiDead: '✨',
+  },
 };
 
 type Flashcard = (typeof FLASHCARDS)[number];
@@ -424,6 +490,28 @@ const FLASHCARDS_ES: Flashcard[] = [
       'P(X = k) = n p k',
       'P(X = k) = pᵏ / n',
       'P(X = k) = C(n, k) / p',
+    ],
+  },
+  {
+    topic: 'discrete',
+    front: 'Media y varianza binomial',
+    back: 'E(X) = np,  Var(X) = np(1 − p)',
+    choices: [
+      'E(X) = np,  Var(X) = np(1 − p)',
+      'E(X) = n + p,  Var(X) = n − p',
+      'E(X) = pⁿ,  Var(X) = √n',
+      'E(X) = n/p,  Var(X) = p(1 − p)',
+    ],
+  },
+  {
+    topic: 'discrete',
+    front: 'Excel binomial P(X = k)',
+    back: 'BINOM.DIST(k, n, p, FALSE)',
+    choices: [
+      'BINOM.DIST(k, n, p, FALSE)',
+      'BINOM.DIST(k, n, p, TRUE)',
+      'NORM.DIST(k, n, p, FALSE)',
+      'AVERAGE(k, n, p)',
     ],
   },
   {

@@ -7,6 +7,7 @@ import {
   HINT_CREDIT,
   MASTER,
   RETRY_CREDIT,
+  examLengthOf,
   getAssessment,
   type TopicId,
 } from '../data/catalog';
@@ -22,6 +23,7 @@ import {
   readMasteryView,
   readProgress,
   readProgressSummary,
+  recordExamScore,
   setTopicUnaided,
   syncTopicToRelated,
   topicUnaided,
@@ -29,10 +31,24 @@ import {
 } from '../state/progress';
 import styles from './QuizPage.module.css';
 
-type Mode = 'smart' | 'all' | 'teachme' | 'nourish' | 'flashcards' | 'finalboss' | TopicId;
+type Mode = 'smart' | 'all' | 'teachme' | 'nourish' | 'flashcards' | 'finalboss' | 'exam' | TopicId;
 
 function param(name: string): string | null {
   return new URLSearchParams(window.location.search).get(name);
+}
+
+function buildExamQuestions(topics: TopicId[], n: number, locale: 'en' | 'es'): Question[] {
+  const qs: Question[] = [];
+  for (let i = 0; i < n; i++) {
+    qs.push(generateQuestion(topics[i % topics.length]!, false, locale));
+  }
+  for (let i = qs.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = qs[i]!;
+    qs[i] = qs[j]!;
+    qs[j] = tmp;
+  }
+  return qs;
 }
 
 function pickTopic(topics: TopicId[], progressId: string, preferUnmastered: boolean): TopicId {
@@ -70,6 +86,13 @@ export function QuizPage() {
     index: number;
   } | null>(null);
   const [invite, setInvite] = useState(false);
+  const [exam, setExam] = useState<{
+    questions: Question[];
+    index: number;
+    results: (boolean | null)[];
+    done: boolean;
+  } | null>(null);
+  const [examGen, setExamGen] = useState(0);
 
   const summary = useMemo(() => readProgressSummary(assessment), [assessment, tick]);
   const mastery = useMemo(() => readMasteryView(assessment), [assessment, tick]);
@@ -86,7 +109,7 @@ export function QuizPage() {
         topic = pickTopic(assessment.topicIds, assessment.id, true);
       } else if (m === 'nourish' || m === 'smart' || m === 'all' || m === 'teachme') {
         topic = pickTopic(assessment.topicIds, assessment.id, m !== 'all');
-      } else if (m === 'finalboss') {
+      } else if (m === 'finalboss' || m === 'exam') {
         topic = pickTopic(assessment.topicIds, assessment.id, true);
       } else {
         topic = m;
@@ -109,8 +132,24 @@ export function QuizPage() {
   }, [boss]);
 
   useEffect(() => {
+    if (mode === 'exam' && assessment.exam) {
+      const n = examLengthOf(assessment);
+      const questions = buildExamQuestions(assessment.topicIds, n, locale);
+      setExam({ questions, index: 0, results: Array(n).fill(null), done: false });
+      setQ(questions[0]!);
+      setPicked('');
+      setHints(0);
+      setShow1(false);
+      setShow2(false);
+      setShow3(false);
+      setFeedback(null);
+      setRetry(false);
+      setBoss(null);
+      return;
+    }
+    setExam(null);
     nextQuestion(mode, bossRef.current ?? undefined);
-  }, [mode, locale, assessment, nextQuestion]);
+  }, [mode, locale, assessment, nextQuestion, examGen]);
 
   useEffect(() => {
     if (allMastered(assessment, readProgress(assessment.id)) && !readProgress(assessment.id).final_boss_cleared) {
@@ -136,15 +175,58 @@ export function QuizPage() {
   function startBoss(practice: boolean) {
     const queue = assessment.topicIds.slice();
     const state = { active: true, practice, queue, index: 0 };
+    setExam(null);
     setBoss(state);
     setInvite(false);
     setMode('finalboss');
     nextQuestion('finalboss', state);
   }
 
+  function finishExam(results: (boolean | null)[]) {
+    const correct = results.filter((r) => r === true).length;
+    recordExamScore(assessment.id, correct, results.length);
+    setTick((n) => n + 1);
+  }
+
+  function examAdvance(results: (boolean | null)[]) {
+    if (!exam) return;
+    const nextIndex = exam.index + 1;
+    if (nextIndex >= exam.questions.length) {
+      finishExam(results);
+      setExam({ ...exam, results, done: true });
+      return;
+    }
+    const nextQ = exam.questions[nextIndex]!;
+    setExam({ ...exam, results, index: nextIndex });
+    setQ(nextQ);
+    setPicked('');
+    setFeedback(null);
+    setRetry(false);
+  }
+
   function onCheck() {
     if (!q) return;
     const ok = checkAnswer(q, picked);
+    if (exam && !exam.done) {
+      if (exam.results[exam.index] != null) return;
+      const results = exam.results.slice();
+      results[exam.index] = ok;
+      if (ok) bump(q.topic, 1, 1);
+      else {
+        const p = readProgress(assessment.id);
+        writeProgress(assessment.id, {
+          ...p,
+          total_attempted: p.total_attempted + 1,
+        });
+        setTick((n) => n + 1);
+      }
+      setExam({ ...exam, results });
+      setFeedback({
+        ok,
+        text: ok ? t.examCorrect : t.examIncorrect,
+      });
+      return;
+    }
     if (boss?.active) {
       if (ok) {
         const nextIndex = boss.index + 1;
@@ -209,7 +291,17 @@ export function QuizPage() {
     return <div className={styles.page}>{t.loading}</div>;
   }
 
-  const noHints = Boolean(boss?.active);
+  const inExam = Boolean(exam && !exam.done);
+  const examDone = Boolean(exam?.done);
+  const noHints = Boolean(boss?.active || inExam || examDone);
+  const examCorrectCount = exam ? exam.results.filter((r) => r === true).length : 0;
+  const examMissedTopics = exam
+    ? Array.from(
+        new Set(
+          exam.questions.filter((_, i) => exam.results[i] === false).map((item) => item.topic),
+        ),
+      )
+    : [];
 
   return (
     <div className={styles.page}>
@@ -234,6 +326,14 @@ export function QuizPage() {
             <span className={styles.statVal}>{summary.attempted}</span>
             <span className={styles.statLbl}>{t.answered}</span>
           </div>
+          {summary.examBest && (
+            <div className={styles.stat}>
+              <span className={styles.statVal}>
+                {summary.examBest.correct}/{summary.examBest.total}
+              </span>
+              <span className={styles.statLbl}>{t.takeTest}</span>
+            </div>
+          )}
         </div>
         <span className={styles.spacer} />
         <div className={styles.toggles}>
@@ -263,7 +363,7 @@ export function QuizPage() {
               key={id}
               type="button"
               className={styles.topic}
-              data-active={mode === id && !boss}
+              data-active={mode === id && !boss && !exam}
               onClick={() => {
                 setBoss(null);
                 setMode(id);
@@ -272,6 +372,20 @@ export function QuizPage() {
               {label}
             </button>
           ))}
+          {assessment.exam && (
+            <button
+              type="button"
+              className={styles.topic}
+              data-boss="true"
+              data-active={mode === 'exam'}
+              onClick={() => {
+                if (mode === 'exam') setExamGen((n) => n + 1);
+                else setMode('exam');
+              }}
+            >
+              {fmt(t.takeTestN, { n: examLengthOf(assessment) })}
+            </button>
+          )}
           {assessment.boss && (
             <button
               type="button"
@@ -288,7 +402,7 @@ export function QuizPage() {
               key={tid}
               type="button"
               className={styles.topic}
-              data-active={mode === tid && !boss}
+              data-active={mode === tid && !boss && !exam}
               onClick={() => {
                 setBoss(null);
                 setMode(tid);
@@ -301,7 +415,7 @@ export function QuizPage() {
         </aside>
 
         <section className={styles.quiz}>
-          {invite && !boss && (
+          {invite && !boss && !exam && (
             <div className={styles.banner}>
               <strong>{theme.name}.</strong> {theme.invite}{' '}
               <button type="button" className={styles.linkish} onClick={() => startBoss(false)}>
@@ -320,6 +434,51 @@ export function QuizPage() {
                 .replace('{topic}', topicLabel(q.topic, locale))}
             </p>
           )}
+          {inExam && exam && (
+            <p className={styles.banner}>
+              {fmt(t.examQuestion, { current: exam.index + 1, total: exam.questions.length })}
+              {' · '}
+              {topicLabel(q.topic, locale)}
+            </p>
+          )}
+
+          {examDone && exam ? (
+            <div className={styles.examDone}>
+              <h1 className={styles.prompt}>{t.examDone}</h1>
+              <p className={styles.examScore}>
+                {fmt(t.examScore, {
+                  correct: examCorrectCount,
+                  total: exam.questions.length,
+                  pct: Math.round((100 * examCorrectCount) / exam.questions.length),
+                })}
+              </p>
+              <p className={styles.blurb}>
+                {examMissedTopics.length
+                  ? `${t.examMissed}: ${examMissedTopics.map((id) => topicLabel(id, locale)).join(', ')}`
+                  : t.examNoneMissed}
+              </p>
+              <div className={styles.actions}>
+                <button
+                  type="button"
+                  className={styles.primary}
+                  onClick={() => {
+                    if (mode === 'exam') setExamGen((n) => n + 1);
+                    else setMode('exam');
+                  }}
+                >
+                  {t.retakeTest}
+                </button>
+                <button
+                  type="button"
+                  className={styles.ghost}
+                  onClick={() => setMode('smart')}
+                >
+                  {t.openPractice}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
           <div className={styles.meta}>
             {boss && <span className={styles.bossFace}>{theme.emoji}</span>}
             <span className={styles.pill}>{topicLabel(q.topic, locale)}</span>
@@ -335,6 +494,7 @@ export function QuizPage() {
                   className={styles.choice}
                   data-on={picked === c}
                   onClick={() => setPicked(c)}
+                  disabled={inExam && exam?.results[exam.index] != null}
                 >
                   {c}
                 </button>
@@ -349,6 +509,7 @@ export function QuizPage() {
               onChange={(e) => setPicked(e.target.value)}
               placeholder={q.unit ? fmt(t.numberPlaceholderUnit, { unit: q.unit }) : t.numberPlaceholder}
               aria-label={t.numericAria}
+              disabled={inExam && exam?.results[exam.index] != null}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') onCheck();
               }}
@@ -383,21 +544,54 @@ export function QuizPage() {
             <div className={`${styles.feedback} ${feedback.ok ? styles.ok : styles.bad}`}>
               {feedback.text}
               {feedback.ok && q.type === 'numeric' ? fmt(t.answerSuffix, { answer: String(q.answer) }) : ''}
+              {inExam && !feedback.ok && q.type === 'numeric' ? fmt(t.answerSuffix, { answer: String(q.answer) }) : ''}
             </div>
           )}
 
           <div className={styles.actions}>
-            <button type="button" className={styles.primary} onClick={onCheck} disabled={!picked}>
-              {retry ? t.checkAgain : t.check}
-            </button>
-            <button
-              type="button"
-              className={styles.ghost}
-              onClick={() => nextQuestion(mode, boss ?? undefined)}
-            >
-              {retry ? t.skip : t.remix}
-            </button>
+            {inExam && exam?.results[exam.index] != null ? (
+              <button
+                type="button"
+                className={styles.primary}
+                onClick={() => examAdvance(exam.results)}
+              >
+                {t.examNext}
+              </button>
+            ) : (
+              <button type="button" className={styles.primary} onClick={onCheck} disabled={!picked}>
+                {retry ? t.checkAgain : t.check}
+              </button>
+            )}
+            {inExam ? (
+              <button
+                type="button"
+                className={styles.ghost}
+                onClick={() => {
+                  if (!exam) return;
+                  const results = exam.results.slice();
+                  if (results[exam.index] == null) results[exam.index] = false;
+                  examAdvance(results);
+                }}
+              >
+                {t.skip}
+              </button>
+            ) : (
+              <button
+                type="button"
+                className={styles.ghost}
+                onClick={() => nextQuestion(mode, boss ?? undefined)}
+              >
+                {retry ? t.skip : t.remix}
+              </button>
+            )}
+            {inExam && (
+              <button type="button" className={styles.ghost} onClick={() => setMode('smart')}>
+                {t.examAbandon}
+              </button>
+            )}
           </div>
+            </>
+          )}
         </section>
 
         <aside className={styles.mastery}>
