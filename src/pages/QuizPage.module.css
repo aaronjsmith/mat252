@@ -190,6 +190,24 @@
   font-weight: 400;
 }
 
+.figure {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0.1rem 0 0.35rem;
+  padding: 0.65rem 0.75rem;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+.figure :global(.q-svg) {
+  width: min(100%, 380px);
+  height: auto;
+  display: block;
+}
+
 .choices {
   display: flex;
   flex-direction: column;

@@ -651,6 +651,12 @@ export function QuizPage() {
             <span className={styles.pill}>{topicLabel(q.topic, locale)}</span>
           </div>
           <MathText as="h1" className={styles.prompt} rich text={q.prompt} />
+          {q.svg ? (
+            <div
+              className={styles.figure}
+              dangerouslySetInnerHTML={{ __html: q.svg }}
+            />
+          ) : null}
 
           {q.type === 'mc' && q.choices && (
             <div className={styles.choices} role="group" aria-label={t.choices}>

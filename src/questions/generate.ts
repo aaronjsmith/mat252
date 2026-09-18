@@ -1,6 +1,7 @@
 import type { TopicId } from '../data/catalog';
 import { localizedFlashcards } from '../i18n/catalog';
 import type { Locale } from '../i18n/locale';
+import { barChartSvg, normalCurveSvg, skewHistogramSvg } from './figures';
 
 export type Question = {
   id: string;
@@ -15,6 +16,8 @@ export type Question = {
   calc: { ti: string; casio: string; excel: string };
   unit?: string;
   values?: number[];
+  /** Inline SVG figure (histogram, bar chart, curve). */
+  svg?: string;
 };
 
 let loc: Locale = 'en';
@@ -118,6 +121,7 @@ function mc(
   hint: string,
   setup = '',
   values?: number[],
+  svg?: string,
 ): Question {
   return {
     id: id(),
@@ -130,6 +134,7 @@ function mc(
     setup,
     calc: calc(''),
     values,
+    svg,
   };
 }
 
@@ -143,6 +148,7 @@ function numeric(
   calcHelp: Question['calc'],
   unit = '',
   values?: number[],
+  svg?: string,
 ): Question {
   return {
     id: id(),
@@ -156,6 +162,7 @@ function numeric(
     calc: calcHelp,
     unit,
     values,
+    svg,
   };
 }
 
@@ -373,46 +380,152 @@ function genSampling(): Question {
 }
 
 function genGraphs(): Question {
+  const ask = choice(['rel', 'count', 'tallest', 'shape', 'which'] as const);
+
+  if (ask === 'which') {
+    return mc(
+      t(
+        'Which display is best for a single quantitative variable’s shape (univariate)?',
+        '¿Qué gráfica es mejor para la forma de una sola variable cuantitativa (univariada)?',
+      ),
+      [
+        t('Histogram', 'Histograma'),
+        t('Pie chart of categories', 'Gráfica circular de categorías'),
+        t('Scatterplot', 'Diagrama de dispersión'),
+        t('Two-way table', 'Tabla de doble entrada'),
+      ],
+      t('Histogram', 'Histograma'),
+      'graphs',
+      t(
+        'Histograms (or stemplots) show shape, center, and spread of one quantitative variable.',
+        'Los histogramas (o diagramas de tallo) muestran forma, centro y dispersión de una variable cuantitativa.',
+      ),
+    );
+  }
+
+  if (ask === 'shape') {
+    const kind = choice(['left', 'right', 'symmetric'] as const);
+    const answer =
+      kind === 'left'
+        ? t('Left-skewed (tail to the left)', 'Sesgado a la izquierda (cola a la izquierda)')
+        : kind === 'right'
+          ? t('Right-skewed (tail to the right)', 'Sesgado a la derecha (cola a la derecha)')
+          : t('Roughly symmetric', 'Aproximadamente simétrico');
+    const choices = [
+      t('Left-skewed (tail to the left)', 'Sesgado a la izquierda (cola a la izquierda)'),
+      t('Right-skewed (tail to the right)', 'Sesgado a la derecha (cola a la derecha)'),
+      t('Roughly symmetric', 'Aproximadamente simétrico'),
+      t('Uniform with no peak', 'Uniforme sin pico'),
+    ];
+    return mc(
+      t(
+        'What shape best describes this histogram?',
+        '¿Qué forma describe mejor este histograma?',
+      ),
+      choices,
+      answer,
+      'graphs',
+      t(
+        'Skew direction follows the longer tail. Symmetric distributions look mirrored about the center.',
+        'La dirección del sesgo sigue la cola más larga. Las distribuciones simétricas se ven reflejadas en el centro.',
+      ),
+      t(
+        'Compare bar heights from left to right; the long thin side is the skew direction.',
+        'Compara las alturas de las barras de izquierda a derecha; el lado largo y delgado es la dirección del sesgo.',
+      ),
+      undefined,
+      skewHistogramSvg(kind, loc),
+    );
+  }
+
   const n = randInt(20, 40);
   const freq = [randInt(3, 9), randInt(4, 10), randInt(2, 8), randInt(3, 9)];
   freq[3] = n - freq[0]! - freq[1]! - freq[2]!;
   if (freq[3]! < 1) return genGraphs();
-  const ask = choice(['rel', 'which']);
-  if (ask === 'rel') {
-    const i = randInt(0, 3);
-    const ans = num(freq[i]! / n, 4);
-    return numeric(
+
+  const labels =
+    loc === 'es'
+      ? ['Int. 1', 'Int. 2', 'Int. 3', 'Int. 4']
+      : ['Bin 1', 'Bin 2', 'Bin 3', 'Bin 4'];
+  const chartTitle = t('Class frequencies', 'Frecuencias de clase');
+  const yLabel = t('Frequency', 'Frecuencia');
+
+  if (ask === 'tallest') {
+    const maxF = Math.max(...freq);
+    if (freq.filter((f) => f === maxF).length > 1) return genGraphs();
+    const i = freq.indexOf(maxF);
+    const chart = barChartSvg({
+      values: freq,
+      labels,
+      title: chartTitle,
+      yLabel,
+      highlight: i,
+      ariaLabel: chartTitle,
+    });
+    return mc(
       t(
-        `A class of ${n} students has frequencies ${freq.join(', ')} in four bins. What is the relative frequency of bin ${i + 1}?`,
-        `Una clase de ${n} estudiantes tiene frecuencias ${freq.join(', ')} en cuatro intervalos. ¿Cuál es la frecuencia relativa del intervalo ${i + 1}?`,
+        `The histogram shows scores for a class of ${n} students. Which bin has the highest frequency?`,
+        `El histograma muestra puntuaciones de una clase de ${n} estudiantes. ¿Qué intervalo tiene la mayor frecuencia?`,
       ),
-      ans,
+      [...labels],
+      labels[i]!,
       'graphs',
-      0.01,
-      t('Relative frequency = class count / n.', 'Frecuencia relativa = conteo de la clase / n.'),
-      `${freq[i]} / ${n}`,
-      calc(`(${freq[i]}) ÷ ${n} =`, `=${freq[i]}/${n}`),
-      '',
+      t(
+        'The tallest bar is the bin with the greatest frequency (count).',
+        'La barra más alta es el intervalo con la mayor frecuencia (conteo).',
+      ),
+      t(`Tallest bar: ${labels[i]} (frequency ${maxF}).`, `Barra más alta: ${labels[i]} (frecuencia ${maxF}).`),
       freq,
+      chart,
     );
   }
-  return mc(
+
+  const i = randInt(0, 3);
+  const chart = barChartSvg({
+    values: freq,
+    labels,
+    title: chartTitle,
+    yLabel,
+    highlight: i,
+    ariaLabel: chartTitle,
+  });
+
+  if (ask === 'count') {
+    return numeric(
+      t(
+        `From the histogram, what is the frequency of ${labels[i]}?`,
+        `Según el histograma, ¿cuál es la frecuencia de ${labels[i]}?`,
+      ),
+      freq[i]!,
+      'graphs',
+      0,
+      t(
+        'Read the height (count) printed on the bar for that bin.',
+        'Lee la altura (conteo) impresa en la barra de ese intervalo.',
+      ),
+      t(`${labels[i]} has frequency ${freq[i]}.`, `${labels[i]} tiene frecuencia ${freq[i]}.`),
+      calc(''),
+      '',
+      freq,
+      chart,
+    );
+  }
+
+  const ans = num(freq[i]! / n, 4);
+  return numeric(
     t(
-      'Which display is best for a single quantitative variable’s shape (univariate)?',
-      '¿Qué gráfica es mejor para la forma de una sola variable cuantitativa (univariada)?',
+      `The histogram shows a class of ${n} students. What is the relative frequency of ${labels[i]}?`,
+      `El histograma muestra una clase de ${n} estudiantes. ¿Cuál es la frecuencia relativa de ${labels[i]}?`,
     ),
-    [
-      t('Histogram', 'Histograma'),
-      t('Pie chart of categories', 'Gráfica circular de categorías'),
-      t('Scatterplot', 'Diagrama de dispersión'),
-      t('Two-way table', 'Tabla de doble entrada'),
-    ],
-    t('Histogram', 'Histograma'),
+    ans,
     'graphs',
-    t(
-      'Histograms (or stemplots) show shape, center, and spread of one quantitative variable.',
-      'Los histogramas (o diagramas de tallo) muestran forma, centro y dispersión de una variable cuantitativa.',
-    ),
+    0.01,
+    t('Relative frequency = class count / n.', 'Frecuencia relativa = conteo de la clase / n.'),
+    `${freq[i]} / ${n}`,
+    calc(`(${freq[i]}) ÷ ${n} =`, `=${freq[i]}/${n}`),
+    '',
+    freq,
+    chart,
   );
 }
 
@@ -593,34 +706,38 @@ function genZScores(): Question {
 }
 
 function genLiteracy(): Question {
-  const items = [
-    [
+  const kind = choice(['ice', 'poll', 'skew'] as const);
+  if (kind === 'skew') {
+    return mc(
       t(
-        'A study finds r = 0.82 between ice cream sales and drowning deaths. The best conclusion is:',
-        'Un estudio halla r = 0.82 entre ventas de helado y muertes por ahogamiento. La mejor conclusión es:',
-      ),
-      t(
-        'A lurking variable (like heat) may drive both; correlation is not causation.',
-        'Una variable oculta (como el calor) puede impulsar ambas; correlación no es causalidad.',
+        'Household income often looks like this histogram. The mean compared with the median is usually:',
+        'El ingreso familiar suele verse como este histograma. La media comparada con la mediana suele ser:',
       ),
       [
-        t(
-          'A lurking variable (like heat) may drive both; correlation is not causation.',
-          'Una variable oculta (como el calor) puede impulsar ambas; correlación no es causalidad.',
-        ),
-        t('Eating ice cream causes drowning.', 'Comer helado causa ahogamientos.'),
-        t('Banning ice cream would stop drowning.', 'Prohibir el helado detendría los ahogamientos.'),
-        t('r = 0.82 proves a causal link.', 'r = 0.82 prueba un vínculo causal.'),
+        t('Mean > median', 'Media > mediana'),
+        t('Mean < median', 'Media < mediana'),
+        t('Mean = median always', 'Media = mediana siempre'),
+        t('The mode equals the mean', 'La moda es igual a la media'),
       ],
-    ],
-    [
+      t('Mean > median', 'Media > mediana'),
+      'literacy',
+      t(
+        'Right-skewed distributions pull the mean toward the long right tail, so mean > median.',
+        'Las distribuciones sesgadas a la derecha jalan la media hacia la cola derecha larga, así que media > mediana.',
+      ),
+      t(
+        'The long right tail means a few large values inflate the mean.',
+        'La cola derecha larga significa que unos pocos valores grandes inflan la media.',
+      ),
+      undefined,
+      skewHistogramSvg('right', loc),
+    );
+  }
+  if (kind === 'poll') {
+    return mc(
       t(
         'A poll of 12 friends on social media is used to estimate a national opinion. The main problem is:',
         'Una encuesta a 12 amigos en redes sociales se usa para estimar una opinión nacional. El problema principal es:',
-      ),
-      t(
-        'The sample is not representative (voluntary / convenience bias).',
-        'La muestra no es representativa (sesgo voluntario / por conveniencia).',
       ),
       [
         t(
@@ -637,26 +754,35 @@ function genLiteracy(): Question {
           'El sesgo es imposible si calculas una media.',
         ),
       ],
-    ],
+      t(
+        'The sample is not representative (voluntary / convenience bias).',
+        'La muestra no es representativa (sesgo voluntario / por conveniencia).',
+      ),
+      'literacy',
+      t(
+        'Watch for bias, confounding, and shape vs center.',
+        'Cuida el sesgo, la confusión y la forma frente al centro.',
+      ),
+    );
+  }
+  return mc(
+    t(
+      'A study finds r = 0.82 between ice cream sales and drowning deaths. The best conclusion is:',
+      'Un estudio halla r = 0.82 entre ventas de helado y muertes por ahogamiento. La mejor conclusión es:',
+    ),
     [
       t(
-        'A histogram of household income is strongly right-skewed. The mean compared with the median is usually:',
-        'Un histograma del ingreso familiar está fuertemente sesgado a la derecha. La media comparada con la mediana suele ser:',
+        'A lurking variable (like heat) may drive both; correlation is not causation.',
+        'Una variable oculta (como el calor) puede impulsar ambas; correlación no es causalidad.',
       ),
-      t('Mean > median', 'Media > mediana'),
-      [
-        t('Mean > median', 'Media > mediana'),
-        t('Mean < median', 'Media < mediana'),
-        t('Mean = median always', 'Media = mediana siempre'),
-        t('The mode equals the mean', 'La moda es igual a la media'),
-      ],
+      t('Eating ice cream causes drowning.', 'Comer helado causa ahogamientos.'),
+      t('Banning ice cream would stop drowning.', 'Prohibir el helado detendría los ahogamientos.'),
+      t('r = 0.82 proves a causal link.', 'r = 0.82 prueba un vínculo causal.'),
     ],
-  ] as const;
-  const [prompt, answer, choices] = choice(items);
-  return mc(
-    prompt,
-    [...choices],
-    answer,
+    t(
+      'A lurking variable (like heat) may drive both; correlation is not causation.',
+      'Una variable oculta (como el calor) puede impulsar ambas; correlación no es causalidad.',
+    ),
     'literacy',
     t(
       'Watch for bias, confounding, and shape vs center.',
@@ -847,6 +973,8 @@ function genNormal(): Question {
       t(`${lo} and ${hi} are μ ± 2σ.`, `${lo} y ${hi} son μ ± 2σ.`),
       calc(''),
       '%',
+      undefined,
+      normalCurveSvg(mu, sigma, lo, hi, loc),
     );
   }
   const z = 1;
