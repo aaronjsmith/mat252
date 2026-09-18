@@ -244,10 +244,10 @@
 .hintBox {
   padding: 10px 12px;
   border-radius: var(--radius-sm);
-  background: var(--accent-highlights-soft);
-  border: 1px solid var(--accent-highlights-border);
+  background: var(--accent-presets-soft);
+  border: 1px solid var(--accent-presets-border);
   font-size: 13px;
-  color: var(--text-secondary);
+  color: var(--accent-presets);
   white-space: pre-wrap;
 }
 

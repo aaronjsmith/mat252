@@ -91,6 +91,25 @@ function calc(ti: string, excel = ''): Question['calc'] {
   return { ti, casio: ti, excel: excel || `=${ti.replace(/÷/g, '/').replace(/×/g, '*')}` };
 }
 
+/** Plain-language gloss for Greek / stats symbols used in prompts. */
+function glossMuSigma(): string {
+  return t(
+    'μ (mu) = population mean; σ (sigma) = population standard deviation.',
+    'μ (mu) = media poblacional; σ (sigma) = desviación estándar poblacional.',
+  );
+}
+
+function glossSample(): string {
+  return t(
+    'x̄ (x-bar) = sample mean; n = sample size; s = sample standard deviation.',
+    'x̄ (x-barra) = media muestral; n = tamaño de muestra; s = desviación estándar muestral.',
+  );
+}
+
+function withGloss(hint: string, ...glosses: string[]): string {
+  return [hint, ...glosses].filter(Boolean).join('\n');
+}
+
 function mc(
   prompt: string,
   choices: string[],
@@ -541,9 +560,12 @@ function genZScores(): Question {
       z,
       'z_scores',
       0.05,
-      t(
-        'z = (x − μ) / σ. Sign tells you which side of the mean.',
-        'z = (x − μ) / σ. El signo indica de qué lado de la media está.',
+      withGloss(
+        t(
+          'z = (x − μ) / σ. The sign tells you which side of the mean x is on.',
+          'z = (x − μ) / σ. El signo indica de qué lado de la media está x.',
+        ),
+        glossMuSigma(),
       ),
       `z = (${x} − ${mu}) / ${sigma}`,
       calc(`(${x} − ${mu}) ÷ ${sigma} =`),
@@ -556,7 +578,13 @@ function genZScores(): Question {
     xv,
     'z_scores',
     0.05,
-    'x = μ + zσ.',
+    withGloss(
+      t(
+        'Solve for x: x = μ + zσ (start at the mean, then move z standard deviations).',
+        'Despeja x: x = μ + zσ (parte de la media y muévete z desviaciones estándar).',
+      ),
+      glossMuSigma(),
+    ),
     `x = ${mu} + (${zAsk})(${sigma})`,
     calc(`${mu} + (${zAsk})×${sigma} =`),
   );
@@ -806,9 +834,12 @@ function genNormal(): Question {
       95,
       'normal',
       0.5,
-      t(
-        'About 95% lie within 2 standard deviations of the mean.',
-        'Cerca del 95% queda a 2 desviaciones estándar de la media.',
+      withGloss(
+        t(
+          'Empirical rule: about 95% of values lie within 2 standard deviations of the mean (μ ± 2σ).',
+          'Regla empírica: cerca del 95% de los valores queda a 2 desviaciones estándar de la media (μ ± 2σ).',
+        ),
+        glossMuSigma(),
       ),
       t(`${lo} and ${hi} are μ ± 2σ.`, `${lo} y ${hi} son μ ± 2σ.`),
       calc(''),
@@ -830,9 +861,12 @@ function genNormal(): Question {
     ],
     t('1 above', '1 por encima'),
     'normal',
-    t(
-      'Distance in σ units is the z-score: (x − μ)/σ.',
-      'La distancia en unidades de σ es la puntuación z: (x − μ)/σ.',
+    withGloss(
+      t(
+        'Distance in σ units is the z-score: (x − μ)/σ.',
+        'La distancia en unidades de σ es la puntuación z: (x − μ)/σ.',
+      ),
+      glossMuSigma(),
     ),
   );
 }
@@ -851,7 +885,14 @@ function genClt(): Question {
       se,
       'clt',
       0.05,
-      t('SE(x̄) = σ / √n.', 'EE(x̄) = σ / √n.'),
+      withGloss(
+        t(
+          'Standard error of the sample mean: SE(x̄) = σ / √n.',
+          'Error estándar de la media muestral: EE(x̄) = σ / √n.',
+        ),
+        glossMuSigma(),
+        glossSample(),
+      ),
       `${sigma} / √${n}`,
       calc(`${sigma} ÷ √(${n}) =`, `=${sigma}/SQRT(${n})`),
     );
@@ -867,7 +908,14 @@ function genClt(): Question {
     z,
     'clt',
     0.08,
-    'z = (x̄ − μ) / (σ/√n).',
+    withGloss(
+      t(
+        'z = (x̄ − μ) / (σ/√n). Use the SE of x̄ in the denominator, not σ alone.',
+        'z = (x̄ − μ) / (σ/√n). Usa el EE de x̄ en el denominador, no σ sola.',
+      ),
+      glossMuSigma(),
+      glossSample(),
+    ),
     t(
       `SE = ${num(se, 4)}; z = (${num(xbar, 2)} − ${mu}) / SE`,
       `EE = ${num(se, 4)}; z = (${num(xbar, 2)} − ${mu}) / EE`,
@@ -892,7 +940,14 @@ function genCi(): Question {
       me,
       'ci',
       0.05,
-      t('ME = z* · (s / √n).', 'ME = z* · (s / √n).'),
+      withGloss(
+        t(
+          'Margin of error: ME = z* · (s / √n). Here s stands in for σ when σ is unknown.',
+          'Margen de error: ME = z* · (s / √n). Aquí s hace de σ cuando σ es desconocida.',
+        ),
+        glossSample(),
+        glossMuSigma(),
+      ),
       `ME = 1.96 × (${s}/√${n})`,
       calc(`1.96 × (${s}÷√${n}) =`, `=1.96*${s}/SQRT(${n})`),
     );
@@ -906,7 +961,14 @@ function genCi(): Question {
     low,
     'ci',
     0.08,
-    t('Lower = x̄ − z* · (s/√n).', 'Inferior = x̄ − z* · (s/√n).'),
+    withGloss(
+      t(
+        'Lower endpoint = x̄ − z* · (s/√n). μ is the population mean the interval estimates.',
+        'Extremo inferior = x̄ − z* · (s/√n). μ es la media poblacional que estima el intervalo.',
+      ),
+      glossSample(),
+      glossMuSigma(),
+    ),
     t(
       `ME = 1.96×(${s}/√${n}); lower = ${xbar} − ME`,
       `ME = 1.96×(${s}/√${n}); inferior = ${xbar} − ME`,
@@ -931,7 +993,14 @@ function genHtOne(): Question {
       z,
       'ht_one',
       0.08,
-      'z = (x̄ − μ₀) / (σ/√n).',
+      withGloss(
+        t(
+          'z = (x̄ − μ₀) / (σ/√n). μ₀ is the hypothesized mean under H₀; Hₐ is the alternative.',
+          'z = (x̄ − μ₀) / (σ/√n). μ₀ es la media hipotética bajo H₀; Hₐ es la alternativa.',
+        ),
+        glossMuSigma(),
+        glossSample(),
+      ),
       `z = (${num(xbar, 2)} − ${mu0}) / (${sigma}/√${n})`,
       calc(`(${num(xbar, 2)} − ${mu0}) ÷ (${sigma}÷√${n}) =`),
     );
@@ -955,9 +1024,15 @@ function genHtOne(): Question {
       'Los datos son inusuales si H₀ es verdadera — evidencia contra H₀',
     ),
     'ht_one',
-    t(
-      'A small p-value is evidence against the null, not proof of the alternative in a logical-certainty sense.',
-      'Un valor p pequeño es evidencia contra la nula, no una prueba de certeza lógica de la alternativa.',
+    withGloss(
+      t(
+        'A small p-value is evidence against the null, not proof of the alternative in a logical-certainty sense.',
+        'Un valor p pequeño es evidencia contra la nula, no una prueba de certeza lógica de la alternativa.',
+      ),
+      t(
+        'H₀ = null hypothesis; Hₐ = alternative; μ = population mean.',
+        'H₀ = hipótesis nula; Hₐ = alternativa; μ = media poblacional.',
+      ),
     ),
   );
 }
