@@ -215,8 +215,13 @@ export function formatRichHtml(text: string): string {
 /** Lightweight HTML for short MC choices. */
 export function formatMathHtml(text: string): string {
   if (text == null || text === '') return '';
-  if (isEquationLine(text) || /[μσχ√̄₀ₐ²]/.test(text) || /[=^_]/.test(text)) {
-    return `<span class="math-inline">${renderTex(toTex(text), false)}</span>`;
+  const s = String(text);
+  // Whole-choice KaTeX only for true equation lines — never prose that merely contains "=".
+  if (isEquationLine(s)) {
+    return `<span class="math-inline">${renderTex(toTex(s), false)}</span>`;
   }
-  return formatInlineProse(text);
+  if (/[μσχ√̄₀ₐ²]/.test(s) || /[=^_]/.test(s)) {
+    return formatInlineProse(s);
+  }
+  return formatPlainMathHtml(s);
 }
