@@ -3,7 +3,6 @@ import { LanguageToggle, ThemeToggle } from './components/header/Toggles';
 import { StatusBar } from './components/StatusBar';
 import { WeekGroup } from './components/modules/WeekGroup';
 import { MasteryChart } from './components/progress/MasteryChart';
-import { CanvasStatus } from './components/course/CanvasStatus';
 import { ASSESSMENTS, WEEK_GROUPS, quizHref } from './data/catalog';
 import { useI18n } from './context/LanguageContext';
 import { readMasteryView, readProgressSummary } from './state/progress';
@@ -37,12 +36,6 @@ export default function App() {
 
       <main className={styles.body}>
         <aside className={styles.sidebar}>
-          <CanvasStatus />
-          <section className={styles.panel}>
-            <p className={styles.kicker}>{t.kickerCourse}</p>
-            <h2 style={{ margin: 0, fontSize: 18 }}>{t.courseTitle}</h2>
-            <p className={styles.lead}>{t.courseLead}</p>
-          </section>
           <section className={styles.panel}>
             <p className={styles.kicker}>{t.kickerProgress}</p>
             <h2 style={{ margin: 0, fontSize: 16 }}>{t.masteryTitle}</h2>
