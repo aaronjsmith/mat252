@@ -44,6 +44,8 @@
   --status-context: #8a919c;
   --status-context-soft: #eef1ec;
   --status-good: #0ca30c;
+  --status-good-soft: #e3f6e3;
+  --status-good-border: #7bc97b;
 
   /* Surfaces & ink — soft sage-tinted canvas, white cards */
   --bg-app: #edf1ea;
@@ -104,6 +106,8 @@
   --status-context: #8a949c;
   --status-context-soft: #242e28;
   --status-good: #34c759;
+  --status-good-soft: #1a3324;
+  --status-good-border: #2f6b3f;
 
   --bg-app: #0f1512;
   --bg-surface: #17211b;
