@@ -4,7 +4,6 @@ import {
   MASTER,
   TOPIC_LABEL,
   topicsForWeek,
-  weekAssessmentForTopic,
 } from '../data/catalog';
 
 export interface TopicProgress {
@@ -74,14 +73,16 @@ export function topicUnaided(state: ProgressState, topicId: TopicId): number {
 }
 
 /**
- * Display/logic unaided for a topic. On compose (overview) quizzes, take the
- * max of overview storage and the owning week quiz so prior week practice counts.
+ * Display/logic unaided for a topic. Use the best progress across this quiz,
+ * its week siblings (week quiz ↔ lesson cards), and the course overview.
  */
 export function effectiveTopicUnaided(assessment: Assessment, topicId: TopicId): number {
   let n = topicUnaided(readProgress(assessment.id), topicId);
-  if (assessment.compose) {
-    const week = weekAssessmentForTopic(topicId);
-    if (week) n = Math.max(n, topicUnaided(readProgress(week.id), topicId));
+  for (const a of ASSESSMENTS) {
+    if (!a.available || a.id === assessment.id || !a.topicIds.includes(topicId)) continue;
+    if (assessment.compose || a.compose || a.weekId === assessment.weekId) {
+      n = Math.max(n, topicUnaided(readProgress(a.id), topicId));
+    }
   }
   return Math.min(MASTER, n);
 }
@@ -191,8 +192,8 @@ export function isMastered(state: ProgressState, topicId: TopicId): boolean {
   return topicUnaided(state, topicId) >= MASTER;
 }
 
-export function allMastered(assessment: Assessment, state: ProgressState): boolean {
-  return assessment.topicIds.every((tid) => isMastered(state, tid));
+export function allMastered(assessment: Assessment, _state?: ProgressState): boolean {
+  return assessment.topicIds.every((tid) => effectiveTopicUnaided(assessment, tid) >= MASTER);
 }
 
 export interface ProgressSummary {
@@ -241,10 +242,13 @@ export function readProgressSummary(assessment: Assessment): ProgressSummary {
 export function relatedAssessmentIds(topicId: TopicId, fromId: string, assessments: Assessment[]): string[] {
   const from = assessments.find((a) => a.id === fromId);
   if (!from || !from.topicIds.includes(topicId)) return [];
-  if (from.compose) {
-    return assessments.filter((a) => !a.compose && a.topicIds.includes(topicId)).map((a) => a.id);
-  }
-  return assessments.filter((a) => a.compose && a.topicIds.includes(topicId)).map((a) => a.id);
+  return assessments
+    .filter((a) => {
+      if (a.id === fromId || !a.available || !a.topicIds.includes(topicId)) return false;
+      // Overview ↔ everything with the topic; within a week, quiz ↔ lesson cards.
+      return from.compose || a.compose || a.weekId === from.weekId;
+    })
+    .map((a) => a.id);
 }
 
 export function syncTopicToRelated(
@@ -254,7 +258,8 @@ export function syncTopicToRelated(
   assessments: Assessment[],
 ): void {
   for (const id of relatedAssessmentIds(topicId, fromId, assessments)) {
-    const p = setTopicUnaided(readProgress(id), topicId, unaided);
+    const cur = topicUnaided(readProgress(id), topicId);
+    const p = setTopicUnaided(readProgress(id), topicId, Math.max(cur, unaided));
     writeProgress(id, p);
   }
 }

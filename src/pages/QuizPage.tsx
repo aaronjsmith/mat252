@@ -27,7 +27,6 @@ import {
 import {
   allMastered,
   effectiveTopicUnaided,
-  isMastered,
   notesKey,
   readMasteryView,
   readProgress,
@@ -75,14 +74,13 @@ function buildExamQuestions(topics: TopicId[], n: number, locale: 'en' | 'es'): 
 }
 
 function pickTopic(topics: TopicId[], progressId: string, preferUnmastered: boolean): TopicId {
-  const p = readProgress(progressId);
-  const pool = preferUnmastered
-    ? topics.filter((t) => !isMastered(p, t))
-    : topics;
+  const assessment = getAssessment(progressId) ?? getAssessment('overview')!;
+  const unaided = (tid: TopicId) => effectiveTopicUnaided(assessment, tid);
+  const pool = preferUnmastered ? topics.filter((t) => unaided(t) < MASTER) : topics;
   const use = pool.length ? pool : topics;
-  use.sort((a, b) => topicUnaided(p, a) - topicUnaided(p, b));
-  const lowest = topicUnaided(p, use[0]!);
-  const tied = use.filter((t) => topicUnaided(p, t) === lowest);
+  use.sort((a, b) => unaided(a) - unaided(b));
+  const lowest = unaided(use[0]!);
+  const tied = use.filter((t) => unaided(t) === lowest);
   return tied[Math.floor(Math.random() * tied.length)]!;
 }
 

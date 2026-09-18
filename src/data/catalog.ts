@@ -662,7 +662,12 @@ export function quizHref(id: string, extra?: Record<string, string>): string {
 }
 
 export function weekAssessmentForTopic(topicId: TopicId): Assessment | undefined {
-  return ASSESSMENTS.find((a) => !a.compose && !a.featured && a.topicIds.includes(topicId));
+  // Prefer the main week quiz (id === weekId), not lesson split cards.
+  return (
+    ASSESSMENTS.find((a) => a.id === a.weekId && a.topicIds.includes(topicId)) ||
+    ASSESSMENTS.find((a) => a.exam && !a.compose && a.topicIds.includes(topicId)) ||
+    ASSESSMENTS.find((a) => !a.compose && !a.featured && a.topicIds.includes(topicId))
+  );
 }
 
 export function examLengthOf(assessment: Assessment): number {
