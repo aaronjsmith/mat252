@@ -138,6 +138,13 @@ function mc(
   };
 }
 
+type McSpec = readonly [prompt: string, answer: string, choices: readonly string[], hint: string];
+
+function pickMc(items: readonly McSpec[], topic: TopicId): Question {
+  const [prompt, answer, choices, hint] = choice(items);
+  return mc(prompt, [...choices], answer, topic, hint);
+}
+
 function numeric(
   prompt: string,
   answer: number,
@@ -171,47 +178,300 @@ function dataSet(n = 8): number[] {
 }
 
 function genDataTypes(): Question {
-  const items = [
+  const kind = choice(['quantCat', 'discCont', 'fourWay'] as const);
+  const quantitative = t('Quantitative', 'Cuantitativa');
+  const categorical = t('Categorical (qualitative)', 'Categórica (cualitativa)');
+  const quantCatChoices = [quantitative, categorical];
+  const discrete = t('Discrete', 'Discreta');
+  const continuous = t('Continuous', 'Continua');
+  const discContChoices = [discrete, continuous];
+
+  if (kind === 'quantCat') {
+    const items: McSpec[] = [
+      [
+        t(
+          'Indicate whether the variable is quantitative or categorical (qualitative): Favorite TV game show.',
+          'Indica si la variable es cuantitativa o categórica (cualitativa): Programa de concursos favorito.',
+        ),
+        categorical,
+        quantCatChoices,
+        t(
+          'A favorite show is a label / category, not a number you average — categorical.',
+          'Un programa favorito es una etiqueta / categoría, no un número que se promedia — categórica.',
+        ),
+      ],
+      [
+        t(
+          'Indicate whether the variable is quantitative or categorical (qualitative): Price (in dollars) of a shirt on the clearance rack.',
+          'Indica si la variable es cuantitativa o categórica (cualitativa): Precio (en dólares) de una camisa en el estante de liquidación.',
+        ),
+        quantitative,
+        quantCatChoices,
+        t(
+          'Price is a numeric measurement — quantitative.',
+          'El precio es una medición numérica — cuantitativa.',
+        ),
+      ],
+      [
+        t(
+          'Indicate whether the variable is quantitative or categorical (qualitative): Name of manufacturer of an automobile.',
+          'Indica si la variable es cuantitativa o categórica (cualitativa): Nombre del fabricante de un automóvil.',
+        ),
+        categorical,
+        quantCatChoices,
+        t(
+          'Manufacturer names are categories with no numeric meaning — categorical.',
+          'Los nombres de fabricantes son categorías sin significado numérico — categórica.',
+        ),
+      ],
+      [
+        t(
+          'Indicate whether the variable is quantitative or categorical (qualitative): Height (in centimeters) of an Olympic athlete.',
+          'Indica si la variable es cuantitativa o categórica (cualitativa): Estatura (en centímetros) de un atleta olímpico.',
+        ),
+        quantitative,
+        quantCatChoices,
+        t('Height is a numeric measurement — quantitative.', 'La estatura es una medición numérica — cuantitativa.'),
+      ],
+      [
+        t(
+          'Indicate whether the variable is quantitative or categorical (qualitative): ZIP code of a student’s home.',
+          'Indica si la variable es cuantitativa o categórica (cualitativa): Código postal del hogar de un estudiante.',
+        ),
+        categorical,
+        quantCatChoices,
+        t(
+          'ZIP codes look numeric but are labels for places — you would not average them — categorical.',
+          'Los códigos postales parecen números pero son etiquetas de lugares — no se promedian — categórica.',
+        ),
+      ],
+      [
+        t(
+          'Indicate whether the variable is quantitative or categorical (qualitative): Number of siblings a student has.',
+          'Indica si la variable es cuantitativa o categórica (cualitativa): Número de hermanos que tiene un estudiante.',
+        ),
+        quantitative,
+        quantCatChoices,
+        t('A count of siblings is numeric — quantitative.', 'Un conteo de hermanos es numérico — cuantitativa.'),
+      ],
+      [
+        t(
+          'Indicate whether the variable is quantitative or categorical (qualitative): Blood type (A, B, AB, O).',
+          'Indica si la variable es cuantitativa o categórica (cualitativa): Tipo de sangre (A, B, AB, O).',
+        ),
+        categorical,
+        quantCatChoices,
+        t('Blood type is a named category — categorical.', 'El tipo de sangre es una categoría con nombre — categórica.'),
+      ],
+      [
+        t(
+          'Indicate whether the variable is quantitative or categorical (qualitative): Annual tuition (in dollars) at a college.',
+          'Indica si la variable es cuantitativa o categórica (cualitativa): Matrícula anual (en dólares) de un colegio.',
+        ),
+        quantitative,
+        quantCatChoices,
+        t('Tuition is a numeric amount — quantitative.', 'La matrícula es una cantidad numérica — cuantitativa.'),
+      ],
+      [
+        t(
+          'Indicate whether the variable is quantitative or categorical (qualitative): Letter grade in a course (A, B, C, D, F).',
+          'Indica si la variable es cuantitativa o categórica (cualitativa): Calificación con letra en un curso (A, B, C, D, F).',
+        ),
+        categorical,
+        quantCatChoices,
+        t(
+          'Letter grades are ordered categories, not measurements you add — categorical (ordinal).',
+          'Las letras son categorías ordenadas, no mediciones que se suman — categórica (ordinal).',
+        ),
+      ],
+      [
+        t(
+          'Indicate whether the variable is quantitative or categorical (qualitative): Time (in minutes) spent studying last night.',
+          'Indica si la variable es cuantitativa o categórica (cualitativa): Tiempo (en minutos) dedicado a estudiar anoche.',
+        ),
+        quantitative,
+        quantCatChoices,
+        t('Study time is a numeric measurement — quantitative.', 'El tiempo de estudio es una medición numérica — cuantitativa.'),
+      ],
+      [
+        t(
+          'Indicate whether the variable is quantitative or categorical (qualitative): Brand of phone a student uses.',
+          'Indica si la variable es cuantitativa o categórica (cualitativa): Marca del teléfono que usa un estudiante.',
+        ),
+        categorical,
+        quantCatChoices,
+        t('Phone brand is a label — categorical.', 'La marca del teléfono es una etiqueta — categórica.'),
+      ],
+      [
+        t(
+          'Indicate whether the variable is quantitative or categorical (qualitative): Temperature (in °F) of a patient.',
+          'Indica si la variable es cuantitativa o categórica (cualitativa): Temperatura (en °F) de un paciente.',
+        ),
+        quantitative,
+        quantCatChoices,
+        t('Temperature is a numeric measurement — quantitative.', 'La temperatura es una medición numérica — cuantitativa.'),
+      ],
+    ];
+    return pickMc(items, 'data_types');
+  }
+
+  if (kind === 'discCont') {
+    const items: McSpec[] = [
+      [
+        t(
+          'Determine whether the variable is best thought of as discrete or continuous: The number of occupied tables at a cafe at 8 p.m. next Friday.',
+          'Determina si la variable se piensa mejor como discreta o continua: El número de mesas ocupadas en un café a las 8 p.m. el próximo viernes.',
+        ),
+        discrete,
+        discContChoices,
+        t(
+          'Tables are counted in whole numbers — discrete.',
+          'Las mesas se cuentan en números enteros — discreta.',
+        ),
+      ],
+      [
+        t(
+          'Determine whether the variable is best thought of as discrete or continuous: The cranial capacity (space inside the skull) of a human skull.',
+          'Determina si la variable se piensa mejor como discreta o continua: La capacidad craneal (espacio dentro del cráneo) de un cráneo humano.',
+        ),
+        continuous,
+        discContChoices,
+        t(
+          'Capacity is a measurement that can take any value in an interval — continuous.',
+          'La capacidad es una medición que puede tomar cualquier valor en un intervalo — continua.',
+        ),
+      ],
+      [
+        t(
+          'Determine whether the variable is best thought of as discrete or continuous: The height of a fifth-grade student.',
+          'Determina si la variable se piensa mejor como discreta o continua: La estatura de un estudiante de quinto grado.',
+        ),
+        continuous,
+        discContChoices,
+        t('Height can take any value in a range — continuous.', 'La estatura puede tomar cualquier valor en un rango — continua.'),
+      ],
+      [
+        t(
+          'Determine whether the variable is best thought of as discrete or continuous: The total number of goals scored by a soccer team in a season.',
+          'Determina si la variable se piensa mejor como discreta o continua: El número total de goles de un equipo de fútbol en una temporada.',
+        ),
+        discrete,
+        discContChoices,
+        t('Goals are counted in whole numbers — discrete.', 'Los goles se cuentan en números enteros — discreta.'),
+      ],
+      [
+        t(
+          'Determine whether the variable is best thought of as discrete or continuous: The number of textbooks a student bought this term.',
+          'Determina si la variable se piensa mejor como discreta o continua: El número de libros de texto que un estudiante compró este término.',
+        ),
+        discrete,
+        discContChoices,
+        t('Books are counted — discrete.', 'Los libros se cuentan — discreta.'),
+      ],
+      [
+        t(
+          'Determine whether the variable is best thought of as discrete or continuous: The length (in minutes) of a sacrament meeting.',
+          'Determina si la variable se piensa mejor como discreta o continua: La duración (en minutos) de una reunión sacramental.',
+        ),
+        continuous,
+        discContChoices,
+        t('Time can take any value in an interval — continuous.', 'El tiempo puede tomar cualquier valor en un intervalo — continua.'),
+      ],
+      [
+        t(
+          'Determine whether the variable is best thought of as discrete or continuous: The number of institute classes a student is enrolled in.',
+          'Determina si la variable se piensa mejor como discreta o continua: El número de clases del instituto en las que está inscrito un estudiante.',
+        ),
+        discrete,
+        discContChoices,
+        t('Class counts are whole numbers — discrete.', 'Los conteos de clases son números enteros — discreta.'),
+      ],
+      [
+        t(
+          'Determine whether the variable is best thought of as discrete or continuous: Weight (in pounds) of a newborn.',
+          'Determina si la variable se piensa mejor como discreta o continua: Peso (en libras) de un recién nacido.',
+        ),
+        continuous,
+        discContChoices,
+        t('Weight is a measurement on a continuous scale — continuous.', 'El peso es una medición en una escala continua — continua.'),
+      ],
+      [
+        t(
+          'Determine whether the variable is best thought of as discrete or continuous: The number of emails received in a day.',
+          'Determina si la variable se piensa mejor como discreta o continua: El número de correos recibidos en un día.',
+        ),
+        discrete,
+        discContChoices,
+        t('Emails are counted — discrete.', 'Los correos se cuentan — discreta.'),
+      ],
+      [
+        t(
+          'Determine whether the variable is best thought of as discrete or continuous: The amount of rainfall (in inches) in a storm.',
+          'Determina si la variable se piensa mejor como discreta o continua: La cantidad de lluvia (en pulgadas) en una tormenta.',
+        ),
+        continuous,
+        discContChoices,
+        t('Rainfall is a measurement that can be any value in a range — continuous.', 'La lluvia es una medición que puede ser cualquier valor en un rango — continua.'),
+      ],
+      [
+        t(
+          'Determine whether the variable is best thought of as discrete or continuous: The number of cars in a testing-center parking lot.',
+          'Determina si la variable se piensa mejor como discreta o continua: El número de autos en el estacionamiento del centro de exámenes.',
+        ),
+        discrete,
+        discContChoices,
+        t('Cars are counted in whole numbers — discrete.', 'Los autos se cuentan en números enteros — discreta.'),
+      ],
+      [
+        t(
+          'Determine whether the variable is best thought of as discrete or continuous: Distance (in miles) a commuter drives to campus.',
+          'Determina si la variable se piensa mejor como discreta o continua: Distancia (en millas) que un estudiante maneja al campus.',
+        ),
+        continuous,
+        discContChoices,
+        t('Distance can take any value in an interval — continuous.', 'La distancia puede tomar cualquier valor en un intervalo — continua.'),
+      ],
+    ];
+    return pickMc(items, 'data_types');
+  }
+
+  const qd = t('Quantitative · discrete', 'Cuantitativa · discreta');
+  const qc = t('Quantitative · continuous', 'Cuantitativa · continua');
+  const qn = t('Qualitative · nominal', 'Cualitativa · nominal');
+  const qo = t('Qualitative · ordinal', 'Cualitativa · ordinal');
+  const four = [qd, qc, qn, qo];
+  const items: McSpec[] = [
     [
       t(
-        'Number of institute students in a ward (count)',
-        'Número de estudiantes del instituto en un barrio (conteo)',
+        'Classify this variable: Number of institute students in a ward (count).',
+        'Clasifica esta variable: Número de estudiantes del instituto en un barrio (conteo).',
       ),
-      t('Quantitative · discrete', 'Cuantitativa · discreta'),
-      [
-        t('Quantitative · discrete', 'Cuantitativa · discreta'),
-        t('Quantitative · continuous', 'Cuantitativa · continua'),
-        t('Qualitative · nominal', 'Cualitativa · nominal'),
-        t('Qualitative · ordinal', 'Cualitativa · ordinal'),
-      ],
+      qd,
+      four,
       t(
         'Counts of people are numeric and cannot be fractions of a person in this context — discrete quantitative.',
         'Los conteos de personas son numéricos y no pueden ser fracciones de persona en este contexto — cuantitativa discreta.',
       ),
     ],
     [
-      t('Time (in minutes) to walk to the temple', 'Tiempo (en minutos) para caminar al templo'),
-      t('Quantitative · continuous', 'Cuantitativa · continua'),
-      [
-        t('Quantitative · continuous', 'Cuantitativa · continua'),
-        t('Quantitative · discrete', 'Cuantitativa · discreta'),
-        t('Qualitative · nominal', 'Cualitativa · nominal'),
-        t('Qualitative · ordinal', 'Cualitativa · ordinal'),
-      ],
+      t(
+        'Classify this variable: Time (in minutes) to walk to the temple.',
+        'Clasifica esta variable: Tiempo (en minutos) para caminar al templo.',
+      ),
+      qc,
+      four,
       t(
         'Time can take any value in an interval — continuous quantitative.',
         'El tiempo puede tomar cualquier valor en un intervalo — cuantitativa continua.',
       ),
     ],
     [
-      t('Home ward (name of congregation)', 'Barrio de origen (nombre de la congregación)'),
-      t('Qualitative · nominal', 'Cualitativa · nominal'),
-      [
-        t('Qualitative · nominal', 'Cualitativa · nominal'),
-        t('Qualitative · ordinal', 'Cualitativa · ordinal'),
-        t('Quantitative · discrete', 'Cuantitativa · discreta'),
-        t('Quantitative · continuous', 'Cuantitativa · continua'),
-      ],
+      t(
+        'Classify this variable: Home ward (name of congregation).',
+        'Clasifica esta variable: Barrio de origen (nombre de la congregación).',
+      ),
+      qn,
+      four,
       t(
         'Names of wards are categories with no ranking — nominal.',
         'Los nombres de barrios son categorías sin orden — nominal.',
@@ -219,44 +479,543 @@ function genDataTypes(): Question {
     ],
     [
       t(
-        'Temple recommend status: none / limited / full',
-        'Estado de la recomendación para el templo: ninguna / limitada / completa',
+        'Classify this variable: Temple recommend status: none / limited / full.',
+        'Clasifica esta variable: Estado de la recomendación para el templo: ninguna / limitada / completa.',
       ),
-      t('Qualitative · ordinal', 'Cualitativa · ordinal'),
-      [
-        t('Qualitative · ordinal', 'Cualitativa · ordinal'),
-        t('Qualitative · nominal', 'Cualitativa · nominal'),
-        t('Quantitative · discrete', 'Cuantitativa · discreta'),
-        t('Quantitative · continuous', 'Cuantitativa · continua'),
-      ],
+      qo,
+      four,
       t('The statuses have a natural order — ordinal.', 'Los estados tienen un orden natural — ordinal.'),
     ],
-  ] as const;
-  const [prompt, answer, choices, hint] = choice(items);
-  return mc(
-    t(`Classify this variable: ${prompt}.`, `Clasifica esta variable: ${prompt}.`),
-    [...choices],
-    answer,
-    'data_types',
-    hint,
-  );
+    [
+      t(
+        'Classify this variable: Shirt size (S / M / L / XL).',
+        'Clasifica esta variable: Talla de camisa (S / M / L / XL).',
+      ),
+      qo,
+      four,
+      t('Sizes have a natural order — ordinal.', 'Las tallas tienen un orden natural — ordinal.'),
+    ],
+    [
+      t(
+        'Classify this variable: Amount of tithing (in dollars) paid last month.',
+        'Clasifica esta variable: Cantidad de diezmo (en dólares) pagada el mes pasado.',
+      ),
+      qc,
+      four,
+      t('Money is a measurement that can take any dollar-and-cent value — continuous quantitative.', 'El dinero es una medición que puede tomar cualquier valor en dólares y centavos — cuantitativa continua.'),
+    ],
+    [
+      t(
+        'Classify this variable: Number of times a hymn is sung in sacrament meeting.',
+        'Clasifica esta variable: Número de veces que se canta un himno en la reunión sacramental.',
+      ),
+      qd,
+      four,
+      t('This is a count — discrete quantitative.', 'Esto es un conteo — cuantitativa discreta.'),
+    ],
+    [
+      t(
+        'Classify this variable: Country of birth.',
+        'Clasifica esta variable: País de nacimiento.',
+      ),
+      qn,
+      four,
+      t('Country names are unordered categories — nominal.', 'Los nombres de países son categorías sin orden — nominal.'),
+    ],
+  ];
+  return pickMc(items, 'data_types');
 }
 
 function genSampling(): Question {
-  const items = [
+  const kind = choice(['popParam', 'popParam', 'methodName', 'methodDesc', 'study'] as const);
+  const parameter = t('Parameter', 'Parámetro');
+  const statistic = t('Statistic', 'Estadístico');
+  const paramChoices = [parameter, statistic];
+
+  if (kind === 'popParam') {
+    const n = randInt(80, 240);
+    const popAvg = num(choice([3.6, 4.2, 4.8, 5.1, 6.4, 7.2]), 1);
+    const sampAvg = num(popAvg + choice([-0.7, -0.4, 0.3, 0.5, 0.8]), 1);
+    const popMax = randInt(14, 22);
+    const sampMax = popMax - randInt(1, 5);
+    const popPct = randInt(90, 99);
+    const sampPct = Math.max(70, popPct - randInt(1, 8));
+    const popMed = randInt(18, 45);
+    const sampMed = popMed + choice([-3, -2, 1, 2, 4]);
+
+    const stories = [
+      {
+        story: t(
+          `According to a report, the average length of stay for a hospital's flu-stricken patients is ${popAvg} days, with a maximum stay of ${popMax} days, and a recovery rate of ${popPct}%. An auditor selected a random group of ${n} of the hospital's flu-stricken patients. The average stay of the audited patients was ${sampAvg} days, their maximum stay was ${sampMax} days, and their recovery rate was ${sampPct}%.`,
+          `Según un informe, la estancia promedio de los pacientes con gripe de un hospital es ${popAvg} días, con una estancia máxima de ${popMax} días y una tasa de recuperación del ${popPct}%. Un auditor eligió un grupo aleatorio de ${n} de los pacientes con gripe del hospital. La estancia promedio de los auditados fue ${sampAvg} días, su estancia máxima fue ${sampMax} días y su tasa de recuperación fue ${sampPct}%.`,
+        ),
+        pop: t("All the hospital's flu-stricken patients", 'Todos los pacientes con gripe del hospital'),
+        sample: t(
+          `The auditor's random group of ${n} of the hospital's flu-stricken patients`,
+          `El grupo aleatorio de ${n} pacientes con gripe del hospital que eligió el auditor`,
+        ),
+        popWrong: t('All hospitals in the state', 'Todos los hospitales del estado'),
+        sampWrong: t('The first patients who recovered', 'Los primeros pacientes que se recuperaron'),
+        facts: [
+          [
+            t(
+              `The maximum stay of ${sampMax} days among the auditor's random group of ${n} of the hospital's flu-stricken patients`,
+              `La estancia máxima de ${sampMax} días en el grupo aleatorio de ${n} pacientes con gripe del auditor`,
+            ),
+            statistic,
+          ],
+          [
+            t(
+              `The average length of stay of ${popAvg} days among all of the hospital's flu-stricken patients`,
+              `La estancia promedio de ${popAvg} días entre todos los pacientes con gripe del hospital`,
+            ),
+            parameter,
+          ],
+          [
+            t(
+              `The ${popPct}% recovery rate among all of the hospital's flu-stricken patients`,
+              `La tasa de recuperación del ${popPct}% entre todos los pacientes con gripe del hospital`,
+            ),
+            parameter,
+          ],
+          [
+            t(
+              `The average stay of ${sampAvg} days among the auditor's random group of ${n} patients`,
+              `La estancia promedio de ${sampAvg} días en el grupo aleatorio de ${n} pacientes del auditor`,
+            ),
+            statistic,
+          ],
+          [
+            t(
+              `The ${sampPct}% recovery rate among the auditor's random group of ${n} patients`,
+              `La tasa de recuperación del ${sampPct}% en el grupo aleatorio de ${n} pacientes del auditor`,
+            ),
+            statistic,
+          ],
+        ],
+      },
+      {
+        story: t(
+          `A college reports that all ${popMed * 40} enrolled students have a mean GPA of ${popAvg} and a median age of ${popMed}. Researchers survey a random sample of ${n} students; the sample mean GPA is ${sampAvg} and the sample median age is ${sampMed}.`,
+          `Un colegio informa que los ${popMed * 40} estudiantes inscritos tienen un GPA medio de ${popAvg} y una edad mediana de ${popMed}. Los investigadores encuestan una muestra aleatoria de ${n} estudiantes; el GPA medio muestral es ${sampAvg} y la edad mediana muestral es ${sampMed}.`,
+        ),
+        pop: t('All enrolled students at the college', 'Todos los estudiantes inscritos del colegio'),
+        sample: t(`The random sample of ${n} students`, `La muestra aleatoria de ${n} estudiantes`),
+        popWrong: t('All colleges in the country', 'Todos los colegios del país'),
+        sampWrong: t('Students who volunteer to post their GPA online', 'Estudiantes que se ofrecen a publicar su GPA en línea'),
+        facts: [
+          [
+            t(
+              `The mean GPA of ${popAvg} among all enrolled students at the college`,
+              `El GPA medio de ${popAvg} entre todos los estudiantes inscritos del colegio`,
+            ),
+            parameter,
+          ],
+          [
+            t(
+              `The sample mean GPA of ${sampAvg} among the ${n} surveyed students`,
+              `El GPA medio muestral de ${sampAvg} entre los ${n} estudiantes encuestados`,
+            ),
+            statistic,
+          ],
+          [
+            t(
+              `The median age of ${popMed} among all enrolled students`,
+              `La edad mediana de ${popMed} entre todos los estudiantes inscritos`,
+            ),
+            parameter,
+          ],
+          [
+            t(
+              `The median age of ${sampMed} in the sample of ${n} students`,
+              `La edad mediana de ${sampMed} en la muestra de ${n} estudiantes`,
+            ),
+            statistic,
+          ],
+        ],
+      },
+      {
+        story: t(
+          `A factory's quality report says ${popPct}% of all microscopes in a new batch pass inspection, and the mean defect count per microscope is ${popAvg}. An inspector randomly tests ${n} microscopes from the batch. In that sample, ${sampPct}% pass and the mean defect count is ${sampAvg}.`,
+          `El informe de calidad de una fábrica dice que el ${popPct}% de todos los microscopios de un lote nuevo pasan la inspección, y el conteo medio de defectos por microscopio es ${popAvg}. Un inspector prueba al azar ${n} microscopios del lote. En esa muestra, el ${sampPct}% pasa y el conteo medio de defectos es ${sampAvg}.`,
+        ),
+        pop: t('All microscopes in the new batch', 'Todos los microscopios del lote nuevo'),
+        sample: t(
+          `The inspector's random sample of ${n} microscopes`,
+          `La muestra aleatoria de ${n} microscopios del inspector`,
+        ),
+        popWrong: t('All products the factory has ever made', 'Todos los productos que la fábrica ha hecho'),
+        sampWrong: t('The first shipment that was easy to reach', 'El primer envío que era fácil de alcanzar'),
+        facts: [
+          [
+            t(
+              `The ${popPct}% pass rate among all microscopes in the new batch`,
+              `La tasa de aprobación del ${popPct}% entre todos los microscopios del lote nuevo`,
+            ),
+            parameter,
+          ],
+          [
+            t(
+              `The ${sampPct}% pass rate among the ${n} tested microscopes`,
+              `La tasa de aprobación del ${sampPct}% entre los ${n} microscopios probados`,
+            ),
+            statistic,
+          ],
+          [
+            t(
+              `The mean defect count of ${popAvg} for the whole batch`,
+              `El conteo medio de defectos de ${popAvg} para todo el lote`,
+            ),
+            parameter,
+          ],
+          [
+            t(
+              `The mean defect count of ${sampAvg} in the inspector's sample of ${n}`,
+              `El conteo medio de defectos de ${sampAvg} en la muestra de ${n} del inspector`,
+            ),
+            statistic,
+          ],
+        ],
+      },
+      {
+        story: t(
+          `A stake directory lists every member. The average weekly church-meeting attendance among all members is ${popPct}%, and the mean commute is ${popAvg} miles. Missionaries randomly interview ${n} members. In the interviews, attendance is ${sampPct}% and the mean commute is ${sampAvg} miles.`,
+          `Un directorio de estaca lista a todos los miembros. La asistencia semanal promedio a las reuniones entre todos los miembros es ${popPct}%, y el traslado medio es ${popAvg} millas. Los misioneros entrevistan al azar a ${n} miembros. En las entrevistas, la asistencia es ${sampPct}% y el traslado medio es ${sampAvg} millas.`,
+        ),
+        pop: t('All members listed in the stake directory', 'Todos los miembros listados en el directorio de estaca'),
+        sample: t(`The ${n} members randomly interviewed`, `Los ${n} miembros entrevistados al azar`),
+        popWrong: t('All members of the Church worldwide', 'Todos los miembros de la Iglesia en el mundo'),
+        sampWrong: t('Members who walk into the building first', 'Los miembros que entran primero al edificio'),
+        facts: [
+          [
+            t(
+              `The ${popPct}% average attendance among all stake members`,
+              `La asistencia promedio del ${popPct}% entre todos los miembros de la estaca`,
+            ),
+            parameter,
+          ],
+          [
+            t(
+              `The ${sampPct}% attendance among the ${n} interviewed members`,
+              `La asistencia del ${sampPct}% entre los ${n} miembros entrevistados`,
+            ),
+            statistic,
+          ],
+          [
+            t(
+              `The mean commute of ${sampAvg} miles in the interview sample`,
+              `El traslado medio de ${sampAvg} millas en la muestra de entrevistas`,
+            ),
+            statistic,
+          ],
+          [
+            t(
+              `The mean commute of ${popAvg} miles among all stake members`,
+              `El traslado medio de ${popAvg} millas entre todos los miembros de la estaca`,
+            ),
+            parameter,
+          ],
+        ],
+      },
+    ] as const;
+
+    const sc = choice(stories);
+    const ask = choice(['pop', 'sample', 'param'] as const);
+    const popChoices = [sc.pop, sc.sample, sc.popWrong, sc.sampWrong];
+    if (ask === 'pop') {
+      return mc(
+        t(
+          `${sc.story}\n\nFor this study, identify the population.`,
+          `${sc.story}\n\nPara este estudio, identifica la población.`,
+        ),
+        popChoices,
+        sc.pop,
+        'sampling',
+        t(
+          'The population is the entire group we want to describe — not just the people who were measured.',
+          'La población es todo el grupo que queremos describir — no solo las personas que se midieron.',
+        ),
+      );
+    }
+    if (ask === 'sample') {
+      return mc(
+        t(
+          `${sc.story}\n\nFor this study, identify the sample.`,
+          `${sc.story}\n\nPara este estudio, identifica la muestra.`,
+        ),
+        popChoices,
+        sc.sample,
+        'sampling',
+        t(
+          'The sample is the subset of the population that was actually selected and measured.',
+          'La muestra es el subconjunto de la población que realmente se eligió y se midió.',
+        ),
+      );
+    }
+    const [fact, ans] = choice(sc.facts);
+    return mc(
+      t(
+        `${sc.story}\n\nIs this number a parameter or a statistic?\n${fact}`,
+        `${sc.story}\n\n¿Este número es un parámetro o un estadístico?\n${fact}`,
+      ),
+      paramChoices,
+      ans,
+      'sampling',
+      t(
+        'A parameter describes the whole population. A statistic describes the sample that was measured.',
+        'Un parámetro describe toda la población. Un estadístico describe la muestra que se midió.',
+      ),
+    );
+  }
+
+  const methodNames = [
+    t('Simple random', 'Aleatorio simple'),
+    t('Stratified', 'Estratificado'),
+    t('Cluster', 'Por conglomerados'),
+    t('Systematic', 'Sistemático'),
+    t('Convenience', 'Por conveniencia'),
+    t('Voluntary response', 'Respuesta voluntaria'),
+  ];
+
+  if (kind === 'methodDesc') {
+    const step = randInt(4, 10);
+    const nTake = randInt(50, 120);
+    const groups = randInt(4, 8);
+    const perGroup = randInt(8, 16);
+    const items: McSpec[] = [
+      [
+        t(
+          `Counselors at a college want to poll students about study time. Which of the following best describes a systematic sample of students?`,
+          `Los consejeros de un colegio quieren encuestar a los estudiantes sobre el tiempo de estudio. ¿Cuál describe mejor una muestra sistemática de estudiantes?`,
+        ),
+        t(
+          `The counselors take a list of the students and select every ${step}th student until ${nTake} students are selected.`,
+          `Los consejeros toman una lista de estudiantes y eligen cada ${step}.º estudiante hasta seleccionar ${nTake}.`,
+        ),
+        [
+          t(
+            `The counselors take a list of the students and select every ${step}th student until ${nTake} students are selected.`,
+            `Los consejeros toman una lista de estudiantes y eligen cada ${step}.º estudiante hasta seleccionar ${nTake}.`,
+          ),
+          t(
+            `The counselors form ${groups} groups of students based on the numbers of classes the students are taking. Then they select ${perGroup} students at random from each group.`,
+            `Los consejeros forman ${groups} grupos según el número de clases. Luego eligen ${perGroup} estudiantes al azar de cada grupo.`,
+          ),
+          t(
+            `The counselors use a computer program to draw ${nTake} students at random. Every set of ${nTake} students is equally likely.`,
+            `Los consejeros usan un programa para extraer ${nTake} estudiantes al azar. Todo conjunto de ${nTake} es igualmente probable.`,
+          ),
+        ],
+        t(
+          'Systematic sampling takes every k-th unit from a list (often after a random start).',
+          'El muestreo sistemático toma cada k-ésima unidad de una lista (a menudo después de un inicio aleatorio).',
+        ),
+      ],
+      [
+        t(
+          `The organizers of a conference want to survey attendees about the registration fee. Which of the following best describes a convenience sample of attendees?`,
+          `Los organizadores de una conferencia quieren encuestar a los asistentes sobre la cuota de inscripción. ¿Cuál describe mejor una muestra por conveniencia de asistentes?`,
+        ),
+        t(
+          `The organizers select the first ${nTake} attendees who register for the conference because these attendees are easily accessible.`,
+          `Los organizadores eligen a los primeros ${nTake} asistentes que se inscriben porque son fáciles de alcanzar.`,
+        ),
+        [
+          t(
+            `The organizers select the first ${nTake} attendees who register for the conference because these attendees are easily accessible.`,
+            `Los organizadores eligen a los primeros ${nTake} asistentes que se inscriben porque son fáciles de alcanzar.`,
+          ),
+          t(
+            `The organizers take a list of the attendees and select every ${step}th attendee until ${nTake} attendees are selected.`,
+            `Los organizadores toman una lista de asistentes y eligen cada ${step}.º hasta seleccionar ${nTake}.`,
+          ),
+          t(
+            `The organizers assign each attendee a number. Using a random number table they draw ${nTake} numbers, then select those attendees. Every set of ${nTake} attendees is equally likely.`,
+            `Los organizadores asignan un número a cada asistente. Con una tabla aleatoria extraen ${nTake} números y eligen a esos asistentes. Todo conjunto de ${nTake} es igualmente probable.`,
+          ),
+        ],
+        t(
+          'A convenience sample uses whoever is easiest to reach — often biased.',
+          'Una muestra por conveniencia usa a quien es más fácil de alcanzar — a menudo sesgada.',
+        ),
+      ],
+      [
+        t(
+          `A chemist wants to test the quality of a new batch of microscopes. Which of the following best describes a stratified sample of microscopes?`,
+          `Un químico quiere probar la calidad de un lote nuevo de microscopios. ¿Cuál describe mejor una muestra estratificada de microscopios?`,
+        ),
+        t(
+          `The chemist forms ${groups} groups of microscopes based on the prices of the microscopes. Then he selects ${perGroup} microscopes at random from each group.`,
+          `El químico forma ${groups} grupos de microscopios según el precio. Luego elige ${perGroup} microscopios al azar de cada grupo.`,
+        ),
+        [
+          t(
+            `The chemist forms ${groups} groups of microscopes based on the prices of the microscopes. Then he selects ${perGroup} microscopes at random from each group.`,
+            `El químico forma ${groups} grupos de microscopios según el precio. Luego elige ${perGroup} microscopios al azar de cada grupo.`,
+          ),
+          t(
+            `The chemist forms groups of ${perGroup} microscopes based on the laboratories they are in. Then he randomly chooses ${groups} groups and selects all of the microscopes in these groups.`,
+            `El químico forma grupos de ${perGroup} microscopios según el laboratorio. Luego elige al azar ${groups} grupos y toma todos los microscopios de esos grupos.`,
+          ),
+          t(
+            `The microscopes in the first shipment that was received are easily accessible, so he selects all ${groups * perGroup} of the microscopes in this shipment.`,
+            `Los microscopios del primer envío son fáciles de alcanzar, así que selecciona los ${groups * perGroup} microscopios de ese envío.`,
+          ),
+        ],
+        t(
+          'Stratified sampling draws a random sample from every subgroup (stratum). Cluster sampling takes whole groups. Convenience takes whatever is handy.',
+          'El muestreo estratificado extrae una muestra aleatoria de cada subgrupo (estrato). El de conglomerados toma grupos enteros. El de conveniencia toma lo que esté a la mano.',
+        ),
+      ],
+      [
+        t(
+          `The student government draws a random sample of 20 freshmen, 20 sophomores, 30 juniors, and 30 seniors to ask about a new grading policy. Identify the kind of sample.`,
+          `El gobierno estudiantil extrae una muestra aleatoria de 20 de primer año, 20 de segundo, 30 de tercero y 30 de cuarto para opinar sobre una nueva política de calificaciones. Identifica el tipo de muestra.`,
+        ),
+        t('Stratified', 'Estratificada'),
+        [
+          t('Stratified', 'Estratificada'),
+          t('Cluster', 'Por conglomerados'),
+          t('Simple random', 'Aleatoria simple'),
+          t('Systematic', 'Sistemática'),
+          t('Convenience', 'Por conveniencia'),
+          t('Voluntary response', 'Respuesta voluntaria'),
+        ],
+        t(
+          'Class year is the stratum. A random sample is taken from every class year, so the sample is stratified.',
+          'El año de estudio es el estrato. Se toma una muestra aleatoria de cada año, así que la muestra es estratificada.',
+        ),
+      ],
+      [
+        t(
+          `In a large retail company, a note is placed with each employee's paycheck inviting them to post their opinion about new benefits on a company blog. Identify the kind of sample.`,
+          `En una gran empresa, se coloca una nota con cada cheque invitando a los empleados a publicar su opinión sobre nuevos beneficios en un blog de la compañía. Identifica el tipo de muestra.`,
+        ),
+        t('Voluntary response', 'Respuesta voluntaria'),
+        [
+          t('Voluntary response', 'Respuesta voluntaria'),
+          t('Simple random', 'Aleatoria simple'),
+          t('Stratified', 'Estratificada'),
+          t('Cluster', 'Por conglomerados'),
+          t('Systematic', 'Sistemática'),
+          t('Convenience', 'Por conveniencia'),
+        ],
+        t(
+          'People choose themselves to respond — that is a voluntary response sample (often biased toward strong opinions).',
+          'Las personas se eligen a sí mismas para responder — eso es una muestra de respuesta voluntaria (a menudo sesgada hacia opiniones fuertes).',
+        ),
+      ],
+      [
+        t(
+          `Which of the following best describes a cluster sample of wards in a stake?`,
+          `¿Cuál describe mejor una muestra por conglomerados de barrios en una estaca?`,
+        ),
+        t(
+          `Randomly choose ${groups} wards, then survey every member of those wards.`,
+          `Elegir al azar ${groups} barrios y encuestar a todos los miembros de esos barrios.`,
+        ),
+        [
+          t(
+            `Randomly choose ${groups} wards, then survey every member of those wards.`,
+            `Elegir al azar ${groups} barrios y encuestar a todos los miembros de esos barrios.`,
+          ),
+          t(
+            `Split members by age group, then take an SRS from every age group.`,
+            `Dividir a los miembros por grupo de edad y tomar una MAS de cada grupo.`,
+          ),
+          t(
+            `Select every ${step}th name on the stake directory after a random start.`,
+            `Elegir cada ${step}.º nombre del directorio de estaca después de un inicio aleatorio.`,
+          ),
+        ],
+        t(
+          'Cluster sampling selects some groups (clusters) and takes all units inside those groups.',
+          'El muestreo por conglomerados elige algunos grupos y toma todas las unidades de esos grupos.',
+        ),
+      ],
+      [
+        t(
+          `Which of the following best describes a simple random sample of ${nTake} students?`,
+          `¿Cuál describe mejor una muestra aleatoria simple de ${nTake} estudiantes?`,
+        ),
+        t(
+          `A computer draws ${nTake} students from the roster so that every set of ${nTake} students is equally likely.`,
+          `Una computadora extrae ${nTake} estudiantes de la lista de modo que todo conjunto de ${nTake} es igualmente probable.`,
+        ),
+        [
+          t(
+            `A computer draws ${nTake} students from the roster so that every set of ${nTake} students is equally likely.`,
+            `Una computadora extrae ${nTake} estudiantes de la lista de modo que todo conjunto de ${nTake} es igualmente probable.`,
+          ),
+          t(
+            `Counselors poll the first ${nTake} students who walk into the testing center.`,
+            `Los consejeros encuestan a los primeros ${nTake} estudiantes que entran al centro de exámenes.`,
+          ),
+          t(
+            `A note on the portal invites any student who wants to post an opinion.`,
+            `Una nota en el portal invita a cualquier estudiante que quiera publicar una opinión.`,
+          ),
+        ],
+        t(
+          'In an SRS, every sample of size n from the population has the same chance of being chosen.',
+          'En una MAS, toda muestra de tamaño n de la población tiene la misma probabilidad de ser elegida.',
+        ),
+      ],
+    ];
+    return pickMc(items, 'sampling');
+  }
+
+  if (kind === 'study') {
+    const items: McSpec[] = [
+      [
+        t(
+          'Researchers randomly assign institute students to a new study app or the usual notes, then compare quiz scores. What kind of study is this?',
+          'Los investigadores asignan al azar a estudiantes del instituto a una nueva app de estudio o a las notas usuales y comparan las calificaciones. ¿Qué tipo de estudio es este?',
+        ),
+        t('Statistical experiment', 'Experimento estadístico'),
+        [
+          t('Statistical experiment', 'Experimento estadístico'),
+          t('Observational study', 'Estudio observacional'),
+          t('Census of a population', 'Censo de una población'),
+          t('Convenience sample only', 'Solo muestra por conveniencia'),
+        ],
+        t(
+          'A treatment is imposed (the app vs usual notes) — that is an experiment.',
+          'Se impone un tratamiento (la app vs las notas usuales) — eso es un experimento.',
+        ),
+      ],
+      [
+        t(
+          'A poll asks students how many hours they sleep and records their GPA. No treatment is assigned. What kind of study is this?',
+          'Una encuesta pregunta a estudiantes cuántas horas duermen y anota su GPA. No se asigna ningún tratamiento. ¿Qué tipo de estudio es este?',
+        ),
+        t('Observational study', 'Estudio observacional'),
+        [
+          t('Observational study', 'Estudio observacional'),
+          t('Statistical experiment', 'Experimento estadístico'),
+          t('Simple random sample of treatments', 'Muestra aleatoria simple de tratamientos'),
+          t('Matched-pairs experiment', 'Experimento de pares emparejados'),
+        ],
+        t(
+          'Values are recorded as they are — no treatment is imposed.',
+          'Se registran los valores tal como son — no se impone un tratamiento.',
+        ),
+      ],
+    ];
+    return pickMc(items, 'sampling');
+  }
+
+  const kth = randInt(5, 12);
+  const nSrs = randInt(30, 80);
+  const nWards = randInt(3, 6);
+  const items: McSpec[] = [
     [
       t(
-        'Every 10th name on a stake directory after a random start.',
-        'Cada décimo nombre en un directorio de estaca después de un inicio aleatorio.',
+        `Which sampling method is this? Every ${kth}th name on a stake directory after a random start.`,
+        `¿Qué método de muestreo es este? Cada ${kth}.º nombre en un directorio de estaca después de un inicio aleatorio.`,
       ),
       t('Systematic', 'Sistemático'),
-      [
-        t('Systematic', 'Sistemático'),
-        t('Simple random', 'Aleatorio simple'),
-        t('Stratified', 'Estratificado'),
-        t('Cluster', 'Por conglomerados'),
-        t('Convenience', 'Por conveniencia'),
-      ],
+      methodNames,
       t(
         'A random start, then every k-th unit, is systematic sampling.',
         'Un inicio aleatorio y luego cada k-ésima unidad es muestreo sistemático.',
@@ -264,17 +1023,11 @@ function genSampling(): Question {
     ],
     [
       t(
-        'Randomly choose 4 wards in a stake, then survey every member of those wards.',
-        'Elegir al azar 4 barrios de una estaca y encuestar a todos los miembros de esos barrios.',
+        `Which sampling method is this? Randomly choose ${nWards} wards in a stake, then survey every member of those wards.`,
+        `¿Qué método de muestreo es este? Elegir al azar ${nWards} barrios de una estaca y encuestar a todos los miembros de esos barrios.`,
       ),
       t('Cluster', 'Por conglomerados'),
-      [
-        t('Cluster', 'Por conglomerados'),
-        t('Stratified', 'Estratificado'),
-        t('Simple random', 'Aleatorio simple'),
-        t('Systematic', 'Sistemático'),
-        t('Convenience', 'Por conveniencia'),
-      ],
+      methodNames,
       t(
         'Wards are clusters; all units inside the selected clusters are taken.',
         'Los barrios son conglomerados; se toman todas las unidades de los conglomerados elegidos.',
@@ -282,17 +1035,11 @@ function genSampling(): Question {
     ],
     [
       t(
-        'Split a campus into first-year / returning students, then take an SRS from each group.',
-        'Dividir un campus en estudiantes de primer año / que regresan y tomar una MAS de cada grupo.',
+        'Which sampling method is this? Split a campus into first-year / returning students, then take an SRS from each group.',
+        '¿Qué método de muestreo es este? Dividir un campus en estudiantes de primer año / que regresan y tomar una MAS de cada grupo.',
       ),
       t('Stratified', 'Estratificado'),
-      [
-        t('Stratified', 'Estratificado'),
-        t('Cluster', 'Por conglomerados'),
-        t('Simple random', 'Aleatorio simple'),
-        t('Systematic', 'Sistemático'),
-        t('Convenience', 'Por conveniencia'),
-      ],
+      methodNames,
       t(
         'Strata are sampled separately so each group is represented.',
         'Los estratos se muestrean por separado para que cada grupo esté representado.',
@@ -300,17 +1047,11 @@ function genSampling(): Question {
     ],
     [
       t(
-        'Survey the first 30 people who walk into the testing center.',
-        'Encuestar a las primeras 30 personas que entran al centro de exámenes.',
+        `Which sampling method is this? Survey the first ${nSrs} people who walk into the testing center.`,
+        `¿Qué método de muestreo es este? Encuestar a las primeras ${nSrs} personas que entran al centro de exámenes.`,
       ),
       t('Convenience', 'Por conveniencia'),
-      [
-        t('Convenience', 'Por conveniencia'),
-        t('Simple random', 'Aleatorio simple'),
-        t('Stratified', 'Estratificado'),
-        t('Cluster', 'Por conglomerados'),
-        t('Systematic', 'Sistemático'),
-      ],
+      methodNames,
       t(
         'Whoever is handy is a convenience sample — often biased.',
         'Quien esté a la mano es una muestra por conveniencia — a menudo sesgada.',
@@ -318,17 +1059,11 @@ function genSampling(): Question {
     ],
     [
       t(
-        'Every equally likely sample of 40 students from the college roster.',
-        'Toda muestra igualmente probable de 40 estudiantes de la lista del colegio.',
+        `Which sampling method is this? Every equally likely sample of ${nSrs} students from the college roster.`,
+        `¿Qué método de muestreo es este? Toda muestra igualmente probable de ${nSrs} estudiantes de la lista del colegio.`,
       ),
       t('Simple random', 'Aleatorio simple'),
-      [
-        t('Simple random', 'Aleatorio simple'),
-        t('Stratified', 'Estratificado'),
-        t('Cluster', 'Por conglomerados'),
-        t('Systematic', 'Sistemático'),
-        t('Convenience', 'Por conveniencia'),
-      ],
+      methodNames,
       t(
         'An SRS gives every sample of size n the same chance.',
         'Una MAS da a cada muestra de tamaño n la misma probabilidad.',
@@ -336,47 +1071,42 @@ function genSampling(): Question {
     ],
     [
       t(
-        'Researchers randomly assign institute students to a new study app or the usual notes, then compare quiz scores.',
-        'Los investigadores asignan al azar a estudiantes del instituto a una nueva app de estudio o a las notas usuales y comparan las calificaciones.',
+        'Which sampling method is this? A radio host asks listeners to call in with their opinion on a new policy.',
+        '¿Qué método de muestreo es este? Un locutor de radio pide a los oyentes que llamen con su opinión sobre una nueva política.',
       ),
-      t('Statistical experiment', 'Experimento estadístico'),
-      [
-        t('Statistical experiment', 'Experimento estadístico'),
-        t('Observational study', 'Estudio observacional'),
-        t('Census of a population', 'Censo de una población'),
-        t('Convenience sample only', 'Solo muestra por conveniencia'),
-      ],
+      t('Voluntary response', 'Respuesta voluntaria'),
+      methodNames,
       t(
-        'A treatment is imposed (the app vs usual notes) — that is an experiment.',
-        'Se impone un tratamiento (la app vs las notas usuales) — eso es un experimento.',
+        'Call-in and write-in polls are voluntary response — people choose themselves.',
+        'Las encuestas de llamadas y mensajes son de respuesta voluntaria — las personas se eligen a sí mismas.',
       ),
     ],
     [
       t(
-        'A poll asks students how many hours they sleep and records their GPA. No treatment is assigned.',
-        'Una encuesta pregunta a estudiantes cuántas horas duermen y anota su GPA. No se asigna ningún tratamiento.',
+        'Identify the kind of sample: random samples of 20 freshmen, 20 sophomores, 30 juniors, and 30 seniors.',
+        'Identifica el tipo de muestra: muestras aleatorias de 20 de primer año, 20 de segundo, 30 de tercero y 30 de cuarto.',
       ),
-      t('Observational study', 'Estudio observacional'),
-      [
-        t('Observational study', 'Estudio observacional'),
-        t('Statistical experiment', 'Experimento estadístico'),
-        t('Simple random sample of treatments', 'Muestra aleatoria simple de tratamientos'),
-        t('Matched-pairs experiment', 'Experimento de pares emparejados'),
-      ],
+      t('Stratified', 'Estratificado'),
+      methodNames,
       t(
-        'Values are recorded as they are — no treatment is imposed.',
-        'Se registran los valores tal como son — no se impone un tratamiento.',
+        'Each class year is a stratum and every stratum is sampled — stratified.',
+        'Cada año de estudio es un estrato y se muestrea cada estrato — estratificado.',
       ),
     ],
-  ] as const;
-  const [prompt, answer, choices, hint] = choice(items);
-  return mc(
-    t(`Which sampling method is this? ${prompt}`, `¿Qué método de muestreo es este? ${prompt}`),
-    [...choices],
-    answer,
-    'sampling',
-    hint,
-  );
+    [
+      t(
+        'Identify the kind of sample: a note with each paycheck invites employees to post opinions on a company blog.',
+        'Identifica el tipo de muestra: una nota con cada cheque invita a los empleados a publicar opiniones en un blog de la compañía.',
+      ),
+      t('Voluntary response', 'Respuesta voluntaria'),
+      methodNames,
+      t(
+        'Employees decide whether to respond — voluntary response.',
+        'Los empleados deciden si responden — respuesta voluntaria.',
+      ),
+    ],
+  ];
+  return pickMc(items, 'sampling');
 }
 
 function genGraphs(): Question {
@@ -903,7 +1633,47 @@ function genDiscrete(): Question {
   const p = choice([0.2, 0.25, 0.4, 0.5]);
   const k = randInt(0, Math.min(3, n));
   const pk = nCk(n, k) * p ** k * (1 - p) ** (n - k);
-  const ask = choice(['binom', 'expect', 'var', 'atleast', 'unusual']);
+  const ask = choice(['binom', 'expect', 'var', 'atleast', 'unusual', 'word'] as const);
+
+  if (ask === 'word') {
+    const trials = randInt(5, 10);
+    const succP = choice([0.2, 0.25, 0.3, 0.4, 0.5]);
+    const x = randInt(0, Math.min(3, trials));
+    const px = nCk(trials, x) * succP ** x * (1 - succP) ** (trials - x);
+    const stories = [
+      t(
+        `A quiz has ${trials} independent multiple-choice questions. A student guesses with P(correct) = ${succP} on each. Find P(exactly ${x} correct). Round to 4 decimals.`,
+        `Un cuestionario tiene ${trials} preguntas de opción múltiple independientes. Un estudiante adivina con P(correcto) = ${succP} en cada una. Halla P(exactamente ${x} correctas). Redondea a 4 decimales.`,
+      ),
+      t(
+        `A free-throw shooter makes each shot independently with probability ${succP}. She takes ${trials} shots. Find P(exactly ${x} makes). Round to 4 decimals.`,
+        `Una tiradora de tiros libres encesta cada tiro independientemente con probabilidad ${succP}. Lanza ${trials} veces. Halla P(exactamente ${x} encestes). Redondea a 4 decimales.`,
+      ),
+      t(
+        `Each of ${trials} independently manufactured parts is defective with probability ${succP}. Find P(exactly ${x} defectives). Round to 4 decimals.`,
+        `Cada una de ${trials} piezas fabricadas de forma independiente es defectuosa con probabilidad ${succP}. Halla P(exactamente ${x} defectuosas). Redondea a 4 decimales.`,
+      ),
+      t(
+        `A seed germinates independently with probability ${succP}. If ${trials} seeds are planted, find P(exactly ${x} germinate). Round to 4 decimals.`,
+        `Una semilla germina independientemente con probabilidad ${succP}. Si se plantan ${trials} semillas, halla P(exactamente ${x} germinan). Redondea a 4 decimales.`,
+      ),
+    ];
+    return numeric(
+      choice(stories),
+      num(px, 4),
+      'discrete',
+      0.002,
+      'Binomial: P(X = k) = C(n,k) p^k (1−p)^{n−k}. Excel: BINOM.DIST(k, n, p, FALSE).',
+      t(
+        `n = ${trials}, k = ${x}, p = ${succP}. C(${trials},${x}) = ${nCk(trials, x)}.`,
+        `n = ${trials}, k = ${x}, p = ${succP}. C(${trials},${x}) = ${nCk(trials, x)}.`,
+      ),
+      calc(
+        `nCr(${trials},${x}) × ${succP}^${x} × ${1 - succP}^${trials - x} =`,
+        `=BINOM.DIST(${x},${trials},${succP},FALSE)`,
+      ),
+    );
+  }
   if (ask === 'binom') {
     return numeric(
       t(
@@ -1391,7 +2161,7 @@ const GENERATORS: Record<TopicId, () => Question> = {
   regression: genRegression,
 };
 
-const RECENT_KEEP = 48;
+const RECENT_KEEP = 64;
 const recentFingerprints: string[] = [];
 
 function fingerprint(q: Question): string {

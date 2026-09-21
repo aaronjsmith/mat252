@@ -378,7 +378,7 @@ export const WEEK_GROUPS: WeekGroup[] = [
   {
     id: 'week3',
     title: 'Week 3 · Binomial & Midterm 1',
-    blurb: 'Discrete random variables and binomial models. Midterm 1 covers Weeks 1–3 (due Sep 21).',
+    blurb: 'Week 3 Quiz reviews Weeks 1–3 (data, sampling, summaries, probability, binomial). Midterm 1 due Sep 21.',
     current: true,
   },
   {
@@ -503,6 +503,22 @@ export const ASSESSMENTS: Assessment[] = [
     flashcards: false,
     boss: true,
     topicIds: ['prob_basic', 'prob_compound'],
+  },
+  {
+    id: 'week3',
+    weekId: 'week3',
+    number: 3,
+    title: 'Week 3 Quiz',
+    summary:
+      'ALEKS-style review of Weeks 1–3: population vs sample, parameters, sampling methods, data types, summaries, probability, and binomial. 50-question testing portion for mastery.',
+    badge: 'Week 3 · False Weights',
+    theme: 'zarahemla',
+    available: true,
+    flashcards: true,
+    boss: true,
+    exam: true,
+    examLength: 50,
+    topicIds: MIDTERM1_TOPICS.slice(),
   },
   {
     id: 'midterm1',
@@ -686,6 +702,83 @@ export function topicsForWeek(weekId: string): TopicId[] {
 }
 
 export const FLASHCARDS: { topic: TopicId; front: string; back: string; choices: string[] }[] = [
+  {
+    topic: 'data_types',
+    front: 'Quantitative vs categorical',
+    back: 'Quantitative is numeric (you can average it); categorical / qualitative is a label or category',
+    choices: [
+      'Quantitative is numeric (you can average it); categorical / qualitative is a label or category',
+      'Quantitative means the sample was chosen at random',
+      'Categorical variables are always counts',
+      'Height and favorite color are both quantitative',
+    ],
+  },
+  {
+    topic: 'data_types',
+    front: 'Discrete vs continuous',
+    back: 'Discrete: countable (often integers). Continuous: any value in an interval (measurements)',
+    choices: [
+      'Discrete: countable (often integers). Continuous: any value in an interval (measurements)',
+      'Discrete variables cannot be graphed',
+      'Continuous variables are always categories',
+      'Counts of people are continuous because time is continuous',
+    ],
+  },
+  {
+    topic: 'sampling',
+    front: 'Population vs sample',
+    back: 'Population = the whole group of interest; sample = the subset actually measured',
+    choices: [
+      'Population = the whole group of interest; sample = the subset actually measured',
+      'Sample = every unit in the study; population = the mean',
+      'Population and sample are the same if n is large',
+      'A census is always a sample of size 30',
+    ],
+  },
+  {
+    topic: 'sampling',
+    front: 'Parameter vs statistic',
+    back: 'A parameter describes a population; a statistic describes a sample',
+    choices: [
+      'A parameter describes a population; a statistic describes a sample',
+      'A parameter is always a percentage; a statistic is always a mean',
+      'Statistics describe populations; parameters describe samples',
+      'Both words mean the same thing',
+    ],
+  },
+  {
+    topic: 'sampling',
+    front: 'Stratified vs cluster',
+    back: 'Stratified: SRS from every group. Cluster: take all (or many) units from some groups',
+    choices: [
+      'Stratified: SRS from every group. Cluster: take all (or many) units from some groups',
+      'Cluster: SRS from every group. Stratified: take whole groups',
+      'Both methods pick whoever is convenient',
+      'Stratified sampling is the same as a census',
+    ],
+  },
+  {
+    topic: 'sampling',
+    front: 'Systematic sample',
+    back: 'Choose every k-th unit from a list (often after a random start)',
+    choices: [
+      'Choose every k-th unit from a list (often after a random start)',
+      'Split into groups and sample from each group',
+      'Pick entire clusters at random and take everyone in them',
+      'Invite volunteers to respond',
+    ],
+  },
+  {
+    topic: 'sampling',
+    front: 'Voluntary response sample',
+    back: 'People choose themselves to respond (call-ins, web polls, posted invitations)',
+    choices: [
+      'People choose themselves to respond (call-ins, web polls, posted invitations)',
+      'Every sample of size n is equally likely',
+      'Every k-th name on a roster is taken',
+      'An SRS is taken from each stratum',
+    ],
+  },
   {
     topic: 'center',
     front: 'Sample mean',

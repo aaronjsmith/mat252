@@ -37,7 +37,8 @@ const WEEK_ES: Record<string, { title: string; blurb: string }> = {
   },
   week3: {
     title: 'Semana 3 · Binomial y Midterm 1',
-    blurb: 'Variables aleatorias discretas y modelos binomiales. El Midterm 1 cubre las semanas 1–3 (vence el 21 de sep).',
+    blurb:
+      'El cuestionario de la semana 3 repasa las semanas 1–3 (datos, muestreo, resúmenes, probabilidad, binomial). Midterm 1 vence el 21 de sep.',
   },
   week4: {
     title: 'Semana 4 · Normal, TLC e IC',
@@ -92,6 +93,12 @@ const ASSESSMENT_ES: Record<string, { title: string; summary: string; badge: str
     title: 'Probabilidad',
     summary: 'Probabilidad clásica, complementos y eventos compuestos.',
     badge: 'Cap. 4 · Echar suertes',
+  },
+  week3: {
+    title: 'Cuestionario de la semana 3',
+    summary:
+      'Repaso al estilo ALEKS de las semanas 1–3: población frente a muestra, parámetros, muestreo, tipos de datos, resúmenes, probabilidad y binomial. Prueba de 50 preguntas para el dominio.',
+    badge: 'Semana 3 · Pesas falsas',
   },
   midterm1: {
     title: 'Midterm 1',
@@ -380,6 +387,83 @@ const THEMES_ES: Record<ThemeId, BossCopy> = {
 type Flashcard = (typeof FLASHCARDS)[number];
 
 const FLASHCARDS_ES: Flashcard[] = [
+  {
+    topic: 'data_types',
+    front: 'Cuantitativa frente a categórica',
+    back: 'Cuantitativa es numérica (se puede promediar); categórica / cualitativa es una etiqueta o categoría',
+    choices: [
+      'Cuantitativa es numérica (se puede promediar); categórica / cualitativa es una etiqueta o categoría',
+      'Cuantitativa significa que la muestra se eligió al azar',
+      'Las variables categóricas siempre son conteos',
+      'La estatura y el color favorito son ambas cuantitativas',
+    ],
+  },
+  {
+    topic: 'data_types',
+    front: 'Discreta frente a continua',
+    back: 'Discreta: contable (a menudo enteros). Continua: cualquier valor en un intervalo (mediciones)',
+    choices: [
+      'Discreta: contable (a menudo enteros). Continua: cualquier valor en un intervalo (mediciones)',
+      'Las variables discretas no se pueden graficar',
+      'Las variables continuas siempre son categorías',
+      'Los conteos de personas son continuos porque el tiempo es continuo',
+    ],
+  },
+  {
+    topic: 'sampling',
+    front: 'Población frente a muestra',
+    back: 'Población = todo el grupo de interés; muestra = el subconjunto que realmente se mide',
+    choices: [
+      'Población = todo el grupo de interés; muestra = el subconjunto que realmente se mide',
+      'Muestra = cada unidad del estudio; población = la media',
+      'Población y muestra son lo mismo si n es grande',
+      'Un censo siempre es una muestra de tamaño 30',
+    ],
+  },
+  {
+    topic: 'sampling',
+    front: 'Parámetro frente a estadístico',
+    back: 'Un parámetro describe una población; un estadístico describe una muestra',
+    choices: [
+      'Un parámetro describe una población; un estadístico describe una muestra',
+      'Un parámetro siempre es un porcentaje; un estadístico siempre es una media',
+      'Los estadísticos describen poblaciones; los parámetros describen muestras',
+      'Ambas palabras significan lo mismo',
+    ],
+  },
+  {
+    topic: 'sampling',
+    front: 'Estratificado frente a conglomerados',
+    back: 'Estratificado: MAS de cada grupo. Conglomerados: se toman todas (o muchas) unidades de algunos grupos',
+    choices: [
+      'Estratificado: MAS de cada grupo. Conglomerados: se toman todas (o muchas) unidades de algunos grupos',
+      'Conglomerados: MAS de cada grupo. Estratificado: se toman grupos enteros',
+      'Ambos métodos eligen a quien esté a la mano',
+      'El muestreo estratificado es lo mismo que un censo',
+    ],
+  },
+  {
+    topic: 'sampling',
+    front: 'Muestra sistemática',
+    back: 'Se elige cada k-ésima unidad de una lista (a menudo después de un inicio aleatorio)',
+    choices: [
+      'Se elige cada k-ésima unidad de una lista (a menudo después de un inicio aleatorio)',
+      'Se divide en grupos y se muestrea de cada grupo',
+      'Se eligen conglomerados enteros al azar y se toma a todos',
+      'Se invita a voluntarios a responder',
+    ],
+  },
+  {
+    topic: 'sampling',
+    front: 'Muestra de respuesta voluntaria',
+    back: 'Las personas se eligen a sí mismas para responder (llamadas, encuestas web, invitaciones publicadas)',
+    choices: [
+      'Las personas se eligen a sí mismas para responder (llamadas, encuestas web, invitaciones publicadas)',
+      'Toda muestra de tamaño n es igualmente probable',
+      'Se toma cada k-ésimo nombre de una lista',
+      'Se toma una MAS de cada estrato',
+    ],
+  },
   {
     topic: 'center',
     front: 'Media muestral',
