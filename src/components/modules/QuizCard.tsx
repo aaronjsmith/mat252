@@ -65,6 +65,17 @@ export function QuizCard({ assessment }: { assessment: Assessment }) {
       <span className={styles.badge}>{copy.badge}</span>
       <h3 className={styles.title}>{copy.title}</h3>
       <p className={styles.summary}>{copy.summary}</p>
+      {assessment.featured && assessment.notecardHref ? (
+        <a
+          className={styles.notecardBanner}
+          href={assessment.notecardHref}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {t.btnNotecard}
+          <span className={styles.notecardHint}>{t.notecardDisclaimer}</span>
+        </a>
+      ) : null}
       <div className={styles.pills}>
         {assessment.topicIds.map((tid) => (
           <span key={tid} className={styles.pill}>
@@ -77,6 +88,16 @@ export function QuizCard({ assessment }: { assessment: Assessment }) {
         <div className={styles.fill} style={{ width: `${pct}%` }} />
       </div>
       <div className={styles.actions}>
+        {assessment.notecardHref ? (
+          <a
+            className={styles.notecardBtn}
+            href={assessment.notecardHref}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t.btnNotecard}
+          </a>
+        ) : null}
         <Link className={styles.primary} href={quizHref(assessment.id)}>
           {t.openPractice}
         </Link>
@@ -84,16 +105,6 @@ export function QuizCard({ assessment }: { assessment: Assessment }) {
           <Link className={styles.ghost} href={quizHref(assessment.id, { mode: 'exam' })}>
             {fmt(t.takeTestN, { n: examN })}
           </Link>
-        ) : null}
-        {assessment.notecardHref ? (
-          <a
-            className={styles.ghost}
-            href={assessment.notecardHref}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t.btnNotecard}
-          </a>
         ) : null}
       </div>
     </article>

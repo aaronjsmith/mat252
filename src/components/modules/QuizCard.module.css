@@ -14,6 +14,7 @@
 .featured {
   border-top-color: var(--accent-highlights);
   box-shadow: var(--shadow-pop);
+  grid-column: 1 / -1;
 }
 
 .compact {
@@ -120,6 +121,49 @@
 .ghost:hover {
   border-color: var(--accent-module-border);
   color: var(--accent-module);
+}
+
+.notecardBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: none;
+  background: var(--accent-highlights);
+  border: 1px solid var(--accent-highlights);
+  color: #fff;
+}
+
+.notecardBtn:hover {
+  filter: brightness(1.05);
+}
+
+.notecardBanner {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 2px 0 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-highlights-soft);
+  border: 1px solid var(--accent-highlights-border);
+  color: var(--accent-highlights);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.notecardBanner:hover {
+  border-color: var(--accent-highlights);
+}
+
+.notecardHint {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
 }
 
 .compactRow {
