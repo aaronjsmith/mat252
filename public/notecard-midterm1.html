@@ -204,7 +204,22 @@
       display: grid;
       grid-template-columns: 1.02fr 1.12fr 0.98fr;
       gap: 0.09in;
-      height: calc(100% - 0.42in);
+      height: calc(100% - 0.92in);
+    }
+
+    .sym-bar {
+      margin: 0.04rem 0 0.06rem;
+      padding: 0.08rem 0.12rem;
+      border: 1.5px solid var(--z);
+      border-radius: 5px;
+      background: rgba(30, 58, 95, 0.06);
+      font-size: 0.5rem;
+      line-height: 1.35;
+    }
+
+    .sym-bar strong {
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      color: var(--z);
     }
 
     .formulas,
@@ -230,8 +245,17 @@
       color: var(--ink);
       font-weight: 600;
       display: inline-block;
-      min-width: 1.2rem;
+      min-width: 1.45rem;
     }
+
+    .defs.sym {
+      columns: 2;
+      column-gap: 0.1in;
+      padding-left: 0.7rem;
+      font-size: 0.47rem;
+    }
+
+    .defs.sym li { break-inside: avoid; }
 
     .pair {
       width: 100%;
@@ -480,16 +504,39 @@
       <span class="side-label">Front · Q1 Q2 Q5 · data &amp; design</span>
       <h2>Midterm 1 · data, graphs, design</h2>
       <p class="exam-strip">Written: Q1 center/5NS/hist/shape (13) · Q2 z / mean / IQR (6) · Q5 experimental design (6). ALEKS: pop/sample, sampling, types, graphs, dot plot, study design.</p>
+      <p class="sym-bar">
+        <strong>μ</strong> (mu) = population mean &nbsp;·&nbsp;
+        <strong>σ</strong> (sigma) = population standard deviation &nbsp;·&nbsp;
+        <strong>x̄</strong> (x-bar) = sample mean &nbsp;·&nbsp;
+        <strong>s</strong> = sample standard deviation &nbsp;·&nbsp;
+        <strong>n</strong> = sample size &nbsp;·&nbsp;
+        <strong>N</strong> = population size
+      </p>
 
       <div class="front-grid">
         <div>
-          <h3>Pop / sample / types</h3>
-          <ul class="defs">
-            <li><span class="lbl">N, μ, σ</span> population size, mean, SD</li>
-            <li><span class="lbl">n, x̄, s</span> sample size, mean, SD</li>
-            <li><span class="lbl">Param.</span> describes population</li>
-            <li><span class="lbl">Stat.</span> describes sample</li>
+          <h3>Symbols · say them in English</h3>
+          <ul class="defs sym">
+            <li><span class="lbl">μ</span> mu · population mean</li>
+            <li><span class="lbl">σ</span> sigma · population SD</li>
+            <li><span class="lbl">x̄</span> x-bar · sample mean</li>
+            <li><span class="lbl">s</span> sample SD</li>
+            <li><span class="lbl">n</span> sample size</li>
+            <li><span class="lbl">N</span> population size</li>
+            <li><span class="lbl">z</span> z-score (SDs from mean)</li>
+            <li><span class="lbl">Σ</span> capital sigma · sum</li>
+            <li><span class="lbl">±</span> plus or minus (μ±σ)</li>
+            <li><span class="lbl">≈</span> approximately</li>
+            <li><span class="lbl">Q1 Q3</span> 1st / 3rd quartile</li>
+            <li><span class="lbl">IQR</span> Q3 − Q1</li>
+            <li><span class="lbl">P(A)</span> probability of A</li>
+            <li><span class="lbl">P(A|B)</span> A given B (conditional)</li>
+            <li><span class="lbl">p</span> binomial success chance</li>
+            <li><span class="lbl">C(n,k)</span> combinations “n choose k”</li>
           </ul>
+          <p class="note">Parameter (μ, σ, N) = population. Statistic (x̄, s, n) = sample.</p>
+
+          <h3>Data types</h3>
           <ul class="formulas">
             <li><span class="lbl">Quant.</span> numeric (average it)</li>
             <li><span class="lbl">Categ.</span> label (qualitative)</li>
@@ -586,7 +633,11 @@
           <div class="z-box">
             <p class="z-title">Q2 · Z-SCORE</p>
             <p class="z-formula">z = (x − μ) / σ &nbsp;·&nbsp; x = μ + zσ</p>
-            <p>+ above mean, − below. |z| large → unusual vs typical.</p>
+            <p>
+              <strong>μ</strong> (mu) = population mean. <strong>σ</strong> (sigma) = population SD.
+              <strong>x</strong> = the data value. <strong>z</strong> = how many SDs x is from the mean
+              (+ above, − below). |z| large → unusual.
+            </p>
           </div>
 
           <h3>Q6 · Empirical rule (mound-shaped)</h3>
@@ -631,7 +682,7 @@
               <text x="532" y="148" text-anchor="middle" font-size="11">+3σ</text>
             </svg>
           </div>
-          <p class="note">Only if mound-shaped. Mark μ, then ±1, ±2, ±3 SD. Tail % = leftover after the middle band.</p>
+          <p class="note">Only if mound-shaped. Center tick is <strong>μ</strong> (mean). Each step is one <strong>σ</strong> (sigma, SD). Tail % = leftover after the middle band.</p>
         </div>
 
         <div>
