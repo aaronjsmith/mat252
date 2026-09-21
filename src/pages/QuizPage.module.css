@@ -125,6 +125,30 @@
   border-color: var(--accent-highlights-border);
 }
 
+.notecard {
+  display: block;
+  margin-top: 10px;
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent-module);
+  text-decoration: none;
+}
+
+.notecard:hover {
+  background: var(--accent-module-soft);
+  text-decoration: underline;
+}
+
+.notecardNote {
+  margin: 0;
+  padding: 0 10px 4px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
 .mastery {
   font-variant-numeric: tabular-nums;
   font-size: 11px;

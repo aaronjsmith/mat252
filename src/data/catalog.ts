@@ -349,6 +349,8 @@ export interface Assessment {
   exam?: boolean;
   examLength?: number;
   featured?: boolean;
+  /** Printable 5×7 study-template notecard (opens in a new tab). */
+  notecardHref?: string;
   topicIds: TopicId[];
 }
 
@@ -518,6 +520,7 @@ export const ASSESSMENTS: Assessment[] = [
     boss: true,
     exam: true,
     examLength: 50,
+    notecardHref: '/notecard-midterm1.html',
     topicIds: MIDTERM1_TOPICS.slice(),
   },
   {
@@ -535,6 +538,7 @@ export const ASSESSMENTS: Assessment[] = [
     exam: true,
     examLength: 20,
     featured: true,
+    notecardHref: '/notecard-midterm1.html',
     topicIds: MIDTERM1_TOPICS.slice(),
   },
   {
@@ -550,6 +554,7 @@ export const ASSESSMENTS: Assessment[] = [
     boss: true,
     exam: true,
     examLength: 10,
+    notecardHref: '/notecard-midterm1.html',
     topicIds: WEEK3_TOPICS.slice(),
   },
   {
@@ -688,6 +693,11 @@ export function weekAssessmentForTopic(topicId: TopicId): Assessment | undefined
 
 export function examLengthOf(assessment: Assessment): number {
   return assessment.examLength ?? Math.max(8, assessment.topicIds.length);
+}
+
+/** First dedicated notecard among a week's quizzes (e.g. Midterm 1). */
+export function weekNotecardHref(quizzes: Assessment[]): string | undefined {
+  return quizzes.find((a) => a.notecardHref)?.notecardHref;
 }
 
 /** Unique topics in a week group, in course catalog order. */

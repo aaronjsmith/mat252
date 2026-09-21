@@ -85,6 +85,16 @@ export function QuizCard({ assessment }: { assessment: Assessment }) {
             {fmt(t.takeTestN, { n: examN })}
           </Link>
         ) : null}
+        {assessment.notecardHref ? (
+          <a
+            className={styles.ghost}
+            href={assessment.notecardHref}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t.btnNotecard}
+          </a>
+        ) : null}
       </div>
     </article>
   );

@@ -595,6 +595,19 @@ export function QuizPage() {
               <span className={styles.mastery}>{effectiveTopicUnaided(assessment, tid)}/{MASTER}</span>
             </button>
           ))}
+          {assessment.notecardHref ? (
+            <>
+              <a
+                className={styles.notecard}
+                href={assessment.notecardHref}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t.btnNotecard}
+              </a>
+              <p className={styles.notecardNote}>{t.notecardDisclaimer}</p>
+            </>
+          ) : null}
         </aside>
 
         <section className={styles.quiz}>

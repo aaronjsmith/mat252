@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Assessment, WeekGroup as WeekGroupType } from '../../data/catalog';
+import { weekNotecardHref } from '../../data/catalog';
 import { useI18n } from '../../context/LanguageContext';
 import { weekText } from '../../i18n/catalog';
 import { fmt } from '../../i18n/locale';
@@ -32,6 +33,7 @@ export function WeekGroup({
   const text = weekText(week, locale);
   const isOverview = week.id === 'overview';
   const weekMastery = readWeekMasteryView(week.id);
+  const notecardHref = weekNotecardHref(quizzes);
   const [collapsed, setCollapsed] = useState(() =>
     isOverview || week.current ? false : Boolean(readCollapsed()[week.id]),
   );
@@ -63,6 +65,16 @@ export function WeekGroup({
             </span>
           </button>
         )}
+        {notecardHref ? (
+          <a
+            className={styles.notecard}
+            href={notecardHref}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t.btnNotecard}
+          </a>
+        ) : null}
         {weekMastery.total > 0 ? (
           <div
             className={styles.ring}

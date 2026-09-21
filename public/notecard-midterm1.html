@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MAT 252 · Midterm 1 · 5×7 Formula + Excel Notecard</title>
+  <link rel="icon" type="image/png" href="/ensign-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1a2332;
+      --muted: #5c6b7a;
+      --line: #c9bba3;
+      --accent: #2e6b4f;
+      --accent-deep: #1d5038;
+      --paper: #fffcf6;
+      --wash: #edf1ea;
+      --z: #1e3a5f;
+      --xl: #1d4e89;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--wash);
+      line-height: 1.28;
+    }
+
+    .toolbar {
+      max-width: 52rem;
+      margin: 0 auto;
+      padding: 1rem 1.25rem 0.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .toolbar h1 {
+      margin: 0;
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .toolbar p {
+      margin: 0.2rem 0 0;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .disclaimer-banner,
+    .expect {
+      max-width: 52rem;
+      margin: 0 auto 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+    }
+
+    .disclaimer-banner {
+      border: 1px solid #b45309;
+      background: #fff7ed;
+      color: #9a3412;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .disclaimer-banner strong,
+    .expect h2 {
+      display: block;
+      margin: 0 0 0.2rem;
+      font-size: 0.95rem;
+    }
+
+    .expect {
+      border: 1px solid var(--accent-deep);
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .expect h2 {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 1.05rem;
+      color: var(--accent-deep);
+    }
+
+    .expect .lead {
+      margin: 0 0 0.65rem;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .expect-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+    }
+
+    .expect h3 {
+      margin: 0 0 0.35rem;
+      font-size: 0.82rem;
+      color: var(--accent);
+    }
+
+    .expect ul {
+      margin: 0;
+      padding-left: 1.1rem;
+      font-size: 0.82rem;
+    }
+
+    .expect li { margin: 0.12rem 0; }
+
+    .pts {
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 0.78rem;
+      color: var(--xl);
+      font-weight: 600;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .btn {
+      font: inherit;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      padding: 0.5rem 0.9rem;
+      cursor: pointer;
+      text-decoration: none;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .deck {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+      padding: 0.75rem 1rem 2rem;
+    }
+
+    .side {
+      width: 7in;
+      height: 5in;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      box-shadow: 0 12px 28px rgba(26, 35, 50, 0.08);
+      padding: 0.14in 0.16in 0.1in;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .side-label {
+      position: absolute;
+      top: 0.05in;
+      right: 0.1in;
+      font-size: 0.48rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .side h2 {
+      margin: 0 0 0.02rem;
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--accent);
+      padding-right: 1.55in;
+    }
+
+    .side h3 {
+      margin: 0.07rem 0 0.03rem;
+      font-size: 0.52rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+      border-bottom: 1px solid rgba(201, 187, 163, 0.7);
+      padding-bottom: 0.02rem;
+    }
+
+    .front-grid,
+    .back-grid {
+      display: grid;
+      grid-template-columns: 1.02fr 1.12fr 0.98fr;
+      gap: 0.09in;
+      height: calc(100% - 0.42in);
+    }
+
+    .formulas,
+    .defs {
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 0.48rem;
+      margin: 0;
+      padding-left: 0.72rem;
+    }
+
+    .formulas li,
+    .defs li { margin: 0.015rem 0; }
+
+    .formulas .lbl,
+    .defs .lbl {
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+      color: var(--muted);
+      font-size: 0.46rem;
+    }
+
+    .defs .lbl {
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      color: var(--ink);
+      font-weight: 600;
+      display: inline-block;
+      min-width: 1.2rem;
+    }
+
+    .pair {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.46rem;
+      margin: 0.03rem 0 0.04rem;
+    }
+
+    .pair th,
+    .pair td {
+      border: 1px solid rgba(201, 187, 163, 0.75);
+      padding: 0.05rem 0.08rem;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .pair th {
+      background: rgba(46, 107, 79, 0.1);
+      font-size: 0.42rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .pair th.xl {
+      background: rgba(29, 78, 137, 0.12);
+      color: var(--xl);
+    }
+
+    .pair .math {
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 0.45rem;
+    }
+
+    .pair .xl-cell {
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 0.43rem;
+      color: var(--xl);
+      font-weight: 500;
+    }
+
+    .pair .tip {
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+      font-size: 0.4rem;
+      color: var(--muted);
+      display: block;
+    }
+
+    .note {
+      margin: 0.02rem 0 0.03rem;
+      font-size: 0.46rem;
+      color: var(--muted);
+    }
+
+    .z-box {
+      margin-top: 0.05rem;
+      padding: 0.1rem 0.14rem;
+      border: 1.5px solid var(--z);
+      border-radius: 5px;
+      background: rgba(30, 58, 95, 0.06);
+    }
+
+    .z-box.xl-box {
+      border-color: var(--xl);
+      background: rgba(29, 78, 137, 0.06);
+    }
+
+    .z-box .z-title {
+      margin: 0 0 0.03rem;
+      font-size: 0.52rem;
+      font-weight: 700;
+      color: var(--z);
+    }
+
+    .z-box.xl-box .z-title { color: var(--xl); }
+
+    .z-box .z-formula {
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 0.6rem;
+      font-weight: 600;
+      margin: 0 0 0.03rem;
+      text-align: center;
+    }
+
+    .z-box p, .z-box ul {
+      margin: 0;
+      font-size: 0.45rem;
+    }
+
+    .z-box ul {
+      padding-left: 0.75rem;
+      margin-top: 0.03rem;
+    }
+
+    .steps {
+      margin: 0;
+      padding-left: 0.8rem;
+      font-size: 0.47rem;
+    }
+
+    .steps li { margin: 0.02rem 0; }
+
+    .pct-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.44rem;
+      margin: 0.04rem 0;
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+    }
+
+    .pct-table th,
+    .pct-table td {
+      border: 1px solid rgba(201, 187, 163, 0.75);
+      padding: 0.05rem 0.1rem;
+      text-align: left;
+    }
+
+    .pct-table th {
+      background: rgba(46, 107, 79, 0.1);
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+      font-size: 0.4rem;
+      text-transform: uppercase;
+    }
+
+    .curve-wrap { text-align: center; margin: 0.04rem 0 0; }
+    .curve-wrap svg { width: 100%; height: auto; max-height: 1.35in; }
+
+    .block-map {
+      font-size: 0.44rem;
+      line-height: 1.25;
+      margin: 0.04rem 0;
+      padding: 0.08rem 0.1rem;
+      border: 1px solid rgba(201, 187, 163, 0.75);
+      border-radius: 4px;
+      background: rgba(46, 107, 79, 0.05);
+    }
+
+    .block-map strong { color: var(--accent-deep); }
+
+    .exam-strip {
+      margin: 0.04rem 0 0;
+      font-size: 0.42rem;
+      color: var(--muted);
+      line-height: 1.25;
+    }
+
+    .footer-tiny {
+      margin-top: 0.04rem;
+      font-size: 0.42rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media print {
+      body { background: #fff; }
+      .toolbar, .disclaimer-banner, .expect { display: none !important; }
+      .deck { padding: 0; gap: 0; }
+      .side {
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        page-break-after: always;
+        break-after: page;
+        margin: 0;
+      }
+      .side:last-child { page-break-after: auto; }
+      @page {
+        size: 7in 5in landscape;
+        margin: 0;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .expect-grid { grid-template-columns: 1fr; }
+      .side {
+        width: min(100%, 7in);
+        height: auto;
+        min-height: 5in;
+      }
+      .front-grid,
+      .back-grid {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <div>
+      <h1>MAT 252 · Midterm 1 notecard (formulas + Excel)</h1>
+      <p>Weeks 1–3 · Copy by hand onto a 5×7 landscape card (7″×5″). Part 2 allows this card + the Midterm Excel Sheet.</p>
+    </div>
+    <div class="toolbar-actions">
+      <a class="btn" href="/quiz?a=midterm1">← Midterm 1 practice</a>
+      <a class="btn" href="/">All quizzes</a>
+      <button class="btn primary" type="button" onclick="window.print()">Print 5×7 template</button>
+    </div>
+  </div>
+
+  <aside class="disclaimer-banner" role="note">
+    <strong>Testing-center disclaimer</strong>
+    Ensign College / testing-center rules typically require a <strong>handwritten</strong> 5×7 notecard
+    plus the Midterm Excel Sheet. This page is an unofficial <strong>study template only</strong> —
+    copy it by hand. Do not bring a printed copy unless your instructor explicitly allows it.
+  </aside>
+
+  <section class="expect" aria-labelledby="expect-title">
+    <h2 id="expect-title">Midterm 1 expectations · 100 points</h2>
+    <p class="lead">Two equal parts. ALEKS is computer; written is testing-center (notecard + Excel sheet only).</p>
+    <div class="expect-grid">
+      <div>
+        <h3>Part 1 · ALEKS · 19 questions · 50 pts</h3>
+        <ul>
+          <li>Population / sample terminology <span class="pts">1</span></li>
+          <li>Sampling methods <span class="pts">1</span></li>
+          <li>Quantitative vs categorical <span class="pts">1</span></li>
+          <li>Discrete vs continuous <span class="pts">1</span></li>
+          <li>Study design <span class="pts">1</span></li>
+          <li>Graph analysis <span class="pts">3</span></li>
+          <li>Dot plot <span class="pts">1</span></li>
+          <li>Measures of center <span class="pts">1.5</span></li>
+          <li>Standard deviation &amp; spread <span class="pts">1.5</span></li>
+          <li>Empirical rule <span class="pts">1</span></li>
+          <li>Five-number summary / IQR <span class="pts">2</span></li>
+          <li>Z-scores <span class="pts">1</span></li>
+          <li>Probability <span class="pts">3</span></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Part 2 · Written · 6 questions · 50 pts</h3>
+        <ul>
+          <li><strong>Q1</strong> Center, 5-number summary, histogram &amp; shape <span class="pts">13</span></li>
+          <li><strong>Q2</strong> Z-score, mean &amp; IQR <span class="pts">6</span></li>
+          <li><strong>Q3</strong> Probability: simple, and/or, <em>conditional</em> <span class="pts">9</span></li>
+          <li><strong>Q4</strong> Binomial distribution &amp; probability <span class="pts">5</span></li>
+          <li><strong>Q5</strong> Experimental design (incl. randomized block) <span class="pts">6</span></li>
+          <li><strong>Q6</strong> Empirical rule <span class="pts">11</span></li>
+        </ul>
+        <p class="lead" style="margin-top:0.55rem;">Written weights: Q1 + Q6 are almost half the written points. Know shape/5NS and 68–95–99.7 cold.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="deck">
+    <article class="side" aria-label="Notecard front">
+      <span class="side-label">Front · Q1 Q2 Q5 · data &amp; design</span>
+      <h2>Midterm 1 · data, graphs, design</h2>
+      <p class="exam-strip">Written: Q1 center/5NS/hist/shape (13) · Q2 z / mean / IQR (6) · Q5 experimental design (6). ALEKS: pop/sample, sampling, types, graphs, dot plot, study design.</p>
+
+      <div class="front-grid">
+        <div>
+          <h3>Pop / sample / types</h3>
+          <ul class="defs">
+            <li><span class="lbl">N, μ, σ</span> population size, mean, SD</li>
+            <li><span class="lbl">n, x̄, s</span> sample size, mean, SD</li>
+            <li><span class="lbl">Param.</span> describes population</li>
+            <li><span class="lbl">Stat.</span> describes sample</li>
+          </ul>
+          <ul class="formulas">
+            <li><span class="lbl">Quant.</span> numeric (average it)</li>
+            <li><span class="lbl">Categ.</span> label (qualitative)</li>
+            <li><span class="lbl">Discrete</span> countable (goals, tables)</li>
+            <li><span class="lbl">Contin.</span> any value in an interval</li>
+            <li><span class="lbl">ZIP/ID</span> look numeric → categorical</li>
+          </ul>
+
+          <h3>Sampling</h3>
+          <ul class="formulas">
+            <li><span class="lbl">SRS</span> every set of n equally likely</li>
+            <li><span class="lbl">Stratified</span> SRS from <em>every</em> group</li>
+            <li><span class="lbl">Cluster</span> all units in <em>some</em> groups</li>
+            <li><span class="lbl">Systematic</span> every k-th (random start)</li>
+            <li><span class="lbl">Conven.</span> whoever is easy to reach</li>
+            <li><span class="lbl">Voluntary</span> people choose themselves</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3>Q5 · Experimental design</h3>
+          <ul class="formulas">
+            <li><span class="lbl">Explanatory</span> what you set / compare (treatment)</li>
+            <li><span class="lbl">Response</span> the measured outcome</li>
+            <li><span class="lbl">Treatment</span> a condition; include a control</li>
+            <li><span class="lbl">Experiment</span> a treatment is <em>imposed</em></li>
+            <li><span class="lbl">Observ.</span> just record — no assignment</li>
+            <li><span class="lbl">Confound</span> lurking factor mixed with treatment</li>
+          </ul>
+          <div class="block-map">
+            <strong>Randomized block:</strong> split units into similar groups (blocks), then <em>randomly assign treatments inside each block</em>.
+            <br />Explanatory → Block 1 / Block 2 → random to T1, T2, control → Response.
+            <br /><strong>Why:</strong> grades 1 &amp; 2 reading programs — if you ignore grade, one program might get extra 2nd graders (better readers). Block on grade, then randomize <em>within</em> each grade.
+          </div>
+          <p class="note">Completely randomized = one big random assignment (no blocks). Block when a known nuisance factor (grade, ward, day) would otherwise unbalance treatments.</p>
+        </div>
+
+        <div>
+          <h3>Q1 · Center, 5NS, graphs</h3>
+          <table class="pair">
+            <thead>
+              <tr><th>Formula</th><th class="xl">Excel</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="math">x̄ = Σx / n</td>
+                <td class="xl-cell">=AVERAGE</td>
+              </tr>
+              <tr>
+                <td class="math">median = middle (sorted)<span class="tip">even n: average two middles</span></td>
+                <td class="xl-cell">=MEDIAN</td>
+              </tr>
+              <tr>
+                <td class="math">mode = most frequent</td>
+                <td class="xl-cell">=MODE.SNGL</td>
+              </tr>
+              <tr>
+                <td class="math">range = max − min</td>
+                <td class="xl-cell">=MAX−MIN</td>
+              </tr>
+              <tr>
+                <td class="math">IQR = Q3 − Q1</td>
+                <td class="xl-cell">=QUARTILE.EXC</td>
+              </tr>
+              <tr>
+                <td class="math">s = √[Σ(x−x̄)²/(n−1)]</td>
+                <td class="xl-cell">=STDEV.S</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="note"><strong>5-number:</strong> min, Q1, median, Q3, max. Outlier fence: 1.5×IQR below Q1 / above Q3.</p>
+          <ul class="formulas">
+            <li>Histogram / stemplot → 1 quantitative</li>
+            <li>Dot plot → each point is a case (same as a skinny hist.)</li>
+            <li>Bar / pie → categorical counts</li>
+            <li>Rel. freq. = count ÷ n</li>
+            <li>Skew follows the <em>long tail</em></li>
+            <li>Right skew → mean &gt; median</li>
+            <li>Left skew → mean &lt; median</li>
+            <li>Symmetric → mean ≈ median</li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-tiny">Unofficial MAT 252 study aid · copy by hand · not affiliated with Ensign College</p>
+    </article>
+
+    <article class="side" aria-label="Notecard back">
+      <span class="side-label">Back · Q2 Q3 Q4 Q6 · z, P, binomial</span>
+      <h2>Z-score · empirical rule · probability · binomial</h2>
+      <p class="exam-strip">Written: Q2 z / IQR (6) · Q3 simple, and/or, conditional (9) · Q4 binomial (5) · Q6 empirical rule (11). ALEKS: z, empirical, probability, spread.</p>
+
+      <div class="back-grid">
+        <div>
+          <div class="z-box">
+            <p class="z-title">Q2 · Z-SCORE</p>
+            <p class="z-formula">z = (x − μ) / σ &nbsp;·&nbsp; x = μ + zσ</p>
+            <p>+ above mean, − below. |z| large → unusual vs typical.</p>
+          </div>
+
+          <h3>Q6 · Empirical rule (mound-shaped)</h3>
+          <table class="pct-table">
+            <thead>
+              <tr><th>From the mean</th><th>About</th><th>z</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>within ±1σ</td><td><strong>≈ 68%</strong></td><td>−1 to +1</td></tr>
+              <tr><td>within ±2σ</td><td><strong>≈ 95%</strong></td><td>−2 to +2</td></tr>
+              <tr><td>within ±3σ</td><td><strong>≈ 99.7%</strong></td><td>−3 to +3</td></tr>
+              <tr><td>each 0→1 side</td><td>≈ 34%</td><td>half of 68%</td></tr>
+              <tr><td>between 1σ and 2σ</td><td>≈ 13.5%</td><td>each side</td></tr>
+              <tr><td>below μ − 1σ</td><td>≈ 16%</td><td>z &lt; −1</td></tr>
+              <tr><td>above μ + 2σ</td><td>≈ 2.5%</td><td>z &gt; +2</td></tr>
+            </tbody>
+          </table>
+          <div class="curve-wrap">
+            <svg viewBox="0 0 640 168" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Empirical-rule normal curve">
+              <line x1="48" y1="132" x2="592" y2="132" stroke="#1a2332" stroke-width="1.3"/>
+              <g stroke="#7eb6d9" stroke-width="1">
+                <line x1="100" y1="124" x2="100" y2="132"/>
+                <line x1="172" y1="100" x2="172" y2="132"/>
+                <line x1="244" y1="62" x2="244" y2="132"/>
+                <line x1="316" y1="28" x2="316" y2="132" stroke-width="1.5"/>
+                <line x1="388" y1="62" x2="388" y2="132"/>
+                <line x1="460" y1="100" x2="460" y2="132"/>
+                <line x1="532" y1="124" x2="532" y2="132"/>
+              </g>
+              <path d="M70 130 C 100 128, 130 114, 172 100 C 210 82, 244 50, 316 28 C 388 50, 422 82, 460 100 C 502 114, 532 128, 562 130" fill="none" stroke="#6b3fa0" stroke-width="2.1" stroke-linecap="round"/>
+              <text x="280" y="72" text-anchor="middle" font-size="11" font-weight="700">34%</text>
+              <text x="352" y="72" text-anchor="middle" font-size="11" font-weight="700">34%</text>
+              <text x="208" y="96" text-anchor="middle" font-size="10">13.5%</text>
+              <text x="424" y="96" text-anchor="middle" font-size="10">13.5%</text>
+              <text x="316" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#1a2332">68% · 95% · 99.7%</text>
+              <text x="100" y="148" text-anchor="middle" font-size="11">−3σ</text>
+              <text x="172" y="148" text-anchor="middle" font-size="11">−2σ</text>
+              <text x="244" y="148" text-anchor="middle" font-size="11">−1σ</text>
+              <text x="316" y="148" text-anchor="middle" font-size="11" font-weight="700">μ</text>
+              <text x="388" y="148" text-anchor="middle" font-size="11">+1σ</text>
+              <text x="460" y="148" text-anchor="middle" font-size="11">+2σ</text>
+              <text x="532" y="148" text-anchor="middle" font-size="11">+3σ</text>
+            </svg>
+          </div>
+          <p class="note">Only if mound-shaped. Mark μ, then ±1, ±2, ±3 SD. Tail % = leftover after the middle band.</p>
+        </div>
+
+        <div>
+          <h3>Q3 · Probability</h3>
+          <table class="pair">
+            <thead>
+              <tr><th>Formula</th><th class="xl">Excel</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="math">P(A) = fav ÷ total<span class="tip">equally likely</span></td>
+                <td class="xl-cell">=fav/total</td>
+              </tr>
+              <tr>
+                <td class="math">P(Aᶜ) = 1 − P(A)</td>
+                <td class="xl-cell">=1−pA</td>
+              </tr>
+              <tr>
+                <td class="math">P(A and B) = P(A)·P(B)<span class="tip">independent</span></td>
+                <td class="xl-cell">=pA*pB</td>
+              </tr>
+              <tr>
+                <td class="math">P(A or B) = P(A)+P(B)−P(both)</td>
+                <td class="xl-cell">=pA+pB−pBoth</td>
+              </tr>
+              <tr>
+                <td class="math">P(A | B) = P(A and B) / P(B)<span class="tip">conditional · “given”</span></td>
+                <td class="xl-cell">=pBoth/pB</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="note">“Given B” = restrict to B’s row/column. Mutually exclusive: P(A and B)=0 so or = add.</p>
+
+          <h3>Q4 · Binomial X ~ B(n,p)</h3>
+          <p class="note">n independent trials, two outcomes, constant p.</p>
+          <table class="pair">
+            <thead>
+              <tr><th>Formula</th><th class="xl">Excel</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="math">P(X=k)=C(n,k)p<sup>k</sup>(1−p)<sup>n−k</sup></td>
+                <td class="xl-cell">=BINOM.DIST(k,n,p,FALSE)</td>
+              </tr>
+              <tr>
+                <td class="math">P(X≤k) cumulative</td>
+                <td class="xl-cell">=BINOM.DIST(k,n,p,TRUE)</td>
+              </tr>
+              <tr>
+                <td class="math">P(X≥1)=1−P(X=0)</td>
+                <td class="xl-cell">=1−BINOM.DIST(0,n,p,FALSE)</td>
+              </tr>
+              <tr>
+                <td class="math">C(n,k)=n!/(k!(n−k)!)</td>
+                <td class="xl-cell">=COMBIN(n,k)</td>
+              </tr>
+              <tr>
+                <td class="math">E(X)=np &nbsp; Var=np(1−p)</td>
+                <td class="xl-cell">=n*p</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="note">Unusual if P &lt; 0.05. Discrete E(X)=Σ[x·P(x)].</p>
+        </div>
+
+        <div>
+          <h3>Excel sheet</h3>
+          <ul class="formulas">
+            <li>=AVERAGE / MEDIAN / MODE.SNGL</li>
+            <li>=STDEV.S &nbsp; =MIN / MAX / COUNT</li>
+            <li>=QUARTILE.EXC(range,1) Q1</li>
+            <li>=QUARTILE.EXC(range,3) Q3</li>
+            <li>=COMBIN(n,k)</li>
+            <li>=BINOM.DIST(k,n,p,FALSE) exact</li>
+            <li>=BINOM.DIST(k,n,p,TRUE) cumul.</li>
+          </ul>
+
+          <div class="z-box xl-box">
+            <p class="z-title">WRITTEN GAME PLAN</p>
+            <ol class="steps">
+              <li><strong>Q1</strong> sort → 5NS, mean/median, hist shape (skew).</li>
+              <li><strong>Q2</strong> z=(x−μ)/σ; IQR=Q3−Q1.</li>
+              <li><strong>Q3</strong> simple ÷; and × if indep.; or add−both; given = and / given.</li>
+              <li><strong>Q4</strong> BINOM.DIST; np for mean.</li>
+              <li><strong>Q5</strong> name explanatory/response; block then randomize inside blocks.</li>
+              <li><strong>Q6</strong> check mound; mark ±1,2,3σ; 68/95/99.7 and leftover tails.</li>
+            </ol>
+          </div>
+          <p class="footer-tiny">Print double-sided · landscape 7″×5″ · handwritten for testing center</p>
+        </div>
+      </div>
+    </article>
+  </div>
+</body>
+</html>
