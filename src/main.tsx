@@ -4,6 +4,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider } from './context/LanguageContext';
 import App from './App';
 import { QuizPage } from './pages/QuizPage';
+import { FinalPracticePage } from './pages/FinalPracticePage';
 import 'katex/dist/katex.min.css';
 import './index.css';
 
@@ -20,7 +21,9 @@ function Root() {
     return () => window.removeEventListener('popstate', onPop);
   }, []);
 
-  const page = path === '/quiz' ? <QuizPage /> : <App />;
+  const query = new URLSearchParams(window.location.search);
+  const isFinalPractice = query.get('a') === 'final-practice' && query.get('mode') === 'written';
+  const page = isFinalPractice ? <FinalPracticePage /> : path === '/quiz' ? <QuizPage /> : <App />;
   return (
     <LanguageProvider>
       <ThemeProvider>{page}</ThemeProvider>

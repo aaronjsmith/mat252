@@ -348,6 +348,7 @@ export interface Assessment {
   boss: boolean;
   exam?: boolean;
   examLength?: number;
+  writtenPractice?: boolean;
   featured?: boolean;
   /** Printable 5×7 study-template notecard (opens in a new tab). */
   notecardHref?: string;
@@ -402,6 +403,12 @@ export const WEEK_GROUPS: WeekGroup[] = [
     id: 'week7',
     title: 'Week 7 · Midterm 2',
     blurb: 'Review and Midterm 2 (Weeks 4–6), available Oct 12–16.',
+  },
+  {
+    id: 'final',
+    title: 'Final exam review',
+    blurb: 'Multi-step written practice for the cumulative final exam review.',
+    current: true,
   },
 ];
 
@@ -669,6 +676,19 @@ export const ASSESSMENTS: Assessment[] = [
     examLength: 20,
     featured: true,
     topicIds: MIDTERM2_TOPICS.slice(),
+  },
+  {
+    id: 'final-practice',
+    weekId: 'final',
+    number: 8,
+    title: 'Final Exam Part 2 Practice',
+    summary: 'Five multi-step written problems weighted to the 50-point Part 2 format, with worked solutions.',
+    badge: 'Written practice · Part 2',
+    theme: 'deseret',
+    available: true,
+    boss: false,
+    writtenPractice: true,
+    topicIds: ['normal', 'clt', 'ci', 'ht_one', 'regression'],
   },
 ];
 

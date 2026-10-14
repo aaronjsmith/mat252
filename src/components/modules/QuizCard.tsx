@@ -24,6 +24,10 @@ export function QuizCard({ assessment }: { assessment: Assessment }) {
       (summary.bossCleared ? t.bossCleared : '') +
       (examLine ? ` · ${examLine}` : '')
     : t.noProgress;
+  const practiceHref = quizHref(
+    assessment.id,
+    assessment.writtenPractice ? { mode: 'written' } : undefined,
+  );
 
   if (assessment.compact) {
     return (
@@ -38,8 +42,8 @@ export function QuizCard({ assessment }: { assessment: Assessment }) {
             </div>
           </div>
           <div className={styles.actions}>
-            <Link className={styles.primary} href={quizHref(assessment.id)}>
-              {t.open}
+            <Link className={styles.primary} href={practiceHref}>
+              {assessment.writtenPractice ? t.startWrittenPractice : t.open}
             </Link>
             {assessment.exam ? (
               <Link className={styles.ghost} href={quizHref(assessment.id, { mode: 'exam' })}>
@@ -83,10 +87,16 @@ export function QuizCard({ assessment }: { assessment: Assessment }) {
           </span>
         ))}
       </div>
-      <p className={styles.progress}>{progressText}</p>
-      <div className={styles.bar} role="presentation">
-        <div className={styles.fill} style={{ width: `${pct}%` }} />
-      </div>
+      {assessment.writtenPractice ? (
+        <p className={styles.progress}>{t.writtenPracticeCardDetail}</p>
+      ) : (
+        <>
+          <p className={styles.progress}>{progressText}</p>
+          <div className={styles.bar} role="presentation">
+            <div className={styles.fill} style={{ width: `${pct}%` }} />
+          </div>
+        </>
+      )}
       <div className={styles.actions}>
         {assessment.notecardHref ? (
           <a
@@ -98,8 +108,8 @@ export function QuizCard({ assessment }: { assessment: Assessment }) {
             {t.btnNotecard}
           </a>
         ) : null}
-        <Link className={styles.primary} href={quizHref(assessment.id)}>
-          {t.openPractice}
+        <Link className={styles.primary} href={practiceHref}>
+          {assessment.writtenPractice ? t.startWrittenPractice : t.openPractice}
         </Link>
         {assessment.exam ? (
           <Link className={styles.ghost} href={quizHref(assessment.id, { mode: 'exam' })}>

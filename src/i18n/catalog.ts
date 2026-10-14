@@ -56,6 +56,10 @@ const WEEK_ES: Record<string, { title: string; blurb: string }> = {
     title: 'Semana 7 · Midterm 2',
     blurb: 'Repaso y Midterm 2 (semanas 4–6), disponible del 12 al 16 de oct.',
   },
+  final: {
+    title: 'Repaso del examen final',
+    blurb: 'Práctica escrita de varios pasos para el repaso acumulativo del examen final.',
+  },
 };
 
 const ASSESSMENT_ES: Record<string, { title: string; summary: string; badge: string }> = {
@@ -150,6 +154,11 @@ const ASSESSMENT_ES: Record<string, { title: string; summary: string; badge: str
     title: 'Midterm 2',
     summary: 'Semanas 4–6: normal, TLC, intervalos, pruebas y regresión. Prueba de 20 preguntas.',
     badge: 'Examen · Deseret',
+  },
+  'final-practice': {
+    title: 'Práctica del examen final Parte 2',
+    summary: 'Cinco problemas escritos de varios pasos con la ponderación de la Parte 2 de 50 puntos. Incluye soluciones desarrolladas.',
+    badge: 'Práctica escrita · Parte 2',
   },
 };
 
